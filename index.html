@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATH TEST SAT - Ximena</title>
+    <title>MATH TEST SAT - CMVI</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:linear-gradient(135deg,#0f0c29,#302b63,#24243e); min-height:100vh; color:#e0e0e0; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
@@ -53,7 +53,10 @@
 
         .q-number { display:inline-block; background:#3a7bd5; color:#fff; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; margin-bottom:15px; }
         .q-text { font-size:1.1rem; line-height:1.8; color:#e8e8e8; margin-bottom:25px; }
-        .q-text .math { font-family:'Cambria Math','Times New Roman',serif; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-style:italic; }
+        .q-text .math { background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; }
+        .q-text .math .katex { font-size:1.05em; }
+        .explanation .step { background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:6px; display:inline-block; margin:2px; }
+        .explanation .step .katex { font-size:0.95em; }
 
         /* OPTIONS */
         .options { display:flex; flex-direction:column; gap:10px; }
@@ -73,7 +76,6 @@
         .explanation.show { display:block; animation:fadeIn 0.4s ease; }
         .explanation h4 { color:#00d2ff; margin-bottom:10px; font-size:0.9rem; }
         .explanation p { color:#ccc; line-height:1.7; font-size:0.92rem; }
-        .explanation .step { font-family:'Cambria Math','Times New Roman',serif; background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:6px; display:inline-block; margin:2px; }
 
         /* NAV */
         .nav-buttons { display:flex; justify-content:space-between; margin-top:25px; gap:12px; }
@@ -145,13 +147,16 @@
             body::before { content:"PROTEGIDO - Prof. Mag. Ing. Carlos Marcelo Vera Irala. Impresion no permitida."; display:block; text-align:center; padding:50px; font-size:20px; color:red; }
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
         <h1>MATH TEST SAT</h1>
-        <p>Ximena — Plataforma de Practica</p>
+        <p>CMVI — Plataforma de Practica</p>
         <p style="color:#555;font-size:0.75rem;margin-top:8px;font-style:italic;">Preparado por: Prof. Mag. Ing. Carlos Marcelo Vera Irala</p>
     </div>
 
@@ -777,6 +782,7 @@ function startQuiz(){
     renderTabs();
     renderQuestions();
     showQuestion(0);
+    renderMath();
     startTimer();
     quizStarted = true;
 }
@@ -799,21 +805,36 @@ function renderQuestions(){
             : '<span class="mode-badge calc">CALCULATOR</span>';
         let optionsHtml = q.options.map((opt,j)=>{
             let letter = String.fromCharCode(65+j);
+            let optText = opt.replace(/<span class="math">([^<]*)<\/span>/g, (m,p1)=>`<span class="math">${toLatex(p1)}</span>`);
             return `<div class="option" data-qi="${i}" data-oi="${j}" onclick="selectOption(${i},${j})">
                 <span class="option-marker">${letter}</span>
-                <span class="option-text">${opt}</span>
+                <span class="option-text">${optText}</span>
             </div>`;
         }).join('');
+
+        let qText = q.text.replace(/<span class="math">([^<]*)<\/span>/g, (m,p1)=>`<span class="math">${toLatex(p1)}</span>`);
+        let expHtml = q.explanation
+            .replace(/<span class="step">([^<]*)<\/span>/g, (m,p1)=>`<span class="step">${toLatex(p1)}</span>`)
+            .replace(/(\d+)\s*\/\s*(\d+)/g, '\\frac{$1}{$2}')
+            .replace(/([a-zA-Z0-9])\^([a-zA-Z0-9]+)/g, '$1^{$2}')
+            .replace(/π/g, '\\pi')
+            .replace(/≠/g, '\\neq')
+            .replace(/≤/g, '\\leq')
+            .replace(/≥/g, '\\geq')
+            .replace(/√/g, '\\sqrt');
+        // Wrap common math patterns in explanation with $ delimiters
+        expHtml = expHtml.replace(/([a-zA-Z])\s*=\s*(-?\d+(?:\.\d+)?)/g, '$1 = $2');
+        expHtml = expHtml.replace(/\$(-?\d+(?:\.\d+)?)\$/g, '$$$1$$');
 
         body.innerHTML += `
         <div class="question-card" id="qc${i}">
             ${i===0?modeBadge:''}
             <span class="q-number">Pregunta ${i+1} de ${questions.length}</span>
-            <p class="q-text">${q.text}</p>
+            <p class="q-text">${qText}</p>
             <div class="options" id="opts${i}">${optionsHtml}</div>
             <div class="explanation" id="exp${i}">
                 <h4>Explicacion:</h4>
-                <p>${q.explanation}</p>
+                <p>${expHtml}</p>
             </div>
         </div>`;
     });
@@ -836,6 +857,7 @@ function showQuestion(idx){
     document.getElementById('qCounter').textContent = `${idx+1} / ${questions.length}`;
     updateProgress();
     renderNavButtons();
+    renderMath();
 }
 
 function renderNavButtons(){
@@ -924,6 +946,7 @@ function submitQuiz(){
             <span class="rc-status">${isCorrect?'Correcta':'Incorrecta'}</span>
         </div>`;
     }
+    renderMath();
 
     let total = questions.length;
     let pct = Math.round(score*100/total);
@@ -960,6 +983,51 @@ function goHome(){
     document.getElementById('resultsArea').innerHTML = '';
     document.querySelectorAll('.section-card').forEach(c=>c.classList.remove('selected'));
     document.getElementById('btnStart').disabled = true;
+}
+
+// ============================================================
+// KaTeX MATH RENDERING
+// ============================================================
+function toLatex(s){
+    // Fractions a/b -> \frac{a}{b}
+    s = s.replace(/(\d+)\s*\/\s*(\d+)/g, '\\frac{$1}{$2}');
+    // |...| -> \lvert ... \rvert
+    s = s.replace(/\|([^|]+)\|/g, '\\lvert $1 \\rvert');
+    // x^NNN -> x^{NNN} (base^exponent)
+    s = s.replace(/([a-zA-Z0-9])\^([a-zA-Z0-9]+)/g, '$1^{$2}');
+    // ^{ already ok
+    // \sqrt -> already ok
+    // ≠ ≠
+    s = s.replace(/≠/g, '\\neq');
+    // ≤ ≥
+    s = s.replace(/≤/g, '\\leq');
+    s = s.replace(/≥/g, '\\geq');
+    // π
+    s = s.replace(/π/g, '\\pi');
+    // Σ
+    s = s.replace(/Σ/g, '\\Sigma');
+    // √
+    s = s.replace(/√/g, '\\sqrt');
+    return s;
+}
+
+function renderMath(){
+    if(typeof renderMathInElement === 'undefined') return;
+    let opts = {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+        ],
+        throwOnError: false,
+        trust: true
+    };
+    let qb = document.getElementById('quizBody');
+    if(qb) renderMathInElement(qb, opts);
+    document.querySelectorAll('.explanation p').forEach(el => {
+        renderMathInElement(el, opts);
+    });
 }
 </script>
 </body>
