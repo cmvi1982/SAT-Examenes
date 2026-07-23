@@ -148,8 +148,7 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 </head>
 <body>
 
@@ -782,7 +781,7 @@ function startQuiz(){
     renderTabs();
     renderQuestions();
     showQuestion(0);
-    renderMath();
+    setTimeout(renderMath, 100);
     startTimer();
     quizStarted = true;
 }
@@ -985,48 +984,49 @@ function goHome(){
     document.getElementById('btnStart').disabled = true;
 }
 
+function restartRenderFlags(){
+    document.querySelectorAll('[data-rendered]').forEach(el => delete el.dataset.rendered);
+}
+
 // ============================================================
 // KaTeX MATH RENDERING
 // ============================================================
 function toLatex(s){
-    // Fractions a/b -> \frac{a}{b}
     s = s.replace(/(\d+)\s*\/\s*(\d+)/g, '\\frac{$1}{$2}');
-    // |...| -> \lvert ... \rvert
     s = s.replace(/\|([^|]+)\|/g, '\\lvert $1 \\rvert');
-    // x^NNN -> x^{NNN} (base^exponent)
     s = s.replace(/([a-zA-Z0-9])\^([a-zA-Z0-9]+)/g, '$1^{$2}');
-    // ^{ already ok
-    // \sqrt -> already ok
-    // ≠ ≠
     s = s.replace(/≠/g, '\\neq');
-    // ≤ ≥
     s = s.replace(/≤/g, '\\leq');
     s = s.replace(/≥/g, '\\geq');
-    // π
     s = s.replace(/π/g, '\\pi');
-    // Σ
     s = s.replace(/Σ/g, '\\Sigma');
-    // √
     s = s.replace(/√/g, '\\sqrt');
+    s = s.replace(/∞/g, '\\infty');
+    s = s.replace(/±/g, '\\pm');
+    s = s.replace(/×/g, '\\times');
+    s = s.replace(/÷/g, '\\div');
     return s;
 }
 
 function renderMath(){
-    if(typeof renderMathInElement === 'undefined') return;
-    let opts = {
-        delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false},
-            {left: '\\(', right: '\\)', display: false},
-            {left: '\\[', right: '\\]', display: true}
-        ],
-        throwOnError: false,
-        trust: true
-    };
-    let qb = document.getElementById('quizBody');
-    if(qb) renderMathInElement(qb, opts);
-    document.querySelectorAll('.explanation p').forEach(el => {
-        renderMathInElement(el, opts);
+    if(typeof katex === 'undefined') return;
+    // Render all <span class="math"> elements
+    document.querySelectorAll('span.math').forEach(el => {
+        if(el.dataset.rendered) return;
+        let latex = toLatex(el.textContent.trim());
+        try {
+            katex.render(latex, el, { throwOnError:false, displayMode:false });
+            el.dataset.rendered = '1';
+        } catch(e){}
+    });
+    // Render all <span class="step"> elements
+    document.querySelectorAll('span.step').forEach(el => {
+        if(el.dataset.rendered) return;
+        let latex = toLatex(el.textContent.trim());
+        try {
+            katex.render(latex, el, { throwOnError:false, displayMode:false });
+            el.dataset.rendered = '1';
+        } catch(e){}
     });
 }
 </script>
