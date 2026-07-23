@@ -3,369 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test de Matemáticas SAT - Ximena</title>
+    <title>MATH TEST SAT - Ximena</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:linear-gradient(135deg,#0f0c29,#302b63,#24243e); min-height:100vh; color:#e0e0e0; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
+        .container { max-width:900px; margin:0 auto; padding:20px; }
+
+        /* HEADER */
+        .header { text-align:center; padding:30px 20px; }
+        .header h1 { font-size:2rem; background:linear-gradient(90deg,#00d2ff,#3a7bd5,#00d2ff); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 3s ease infinite; margin-bottom:8px; }
+        @keyframes shimmer { 0%,100%{background-position:0%} 50%{background-position:100%} }
+        .header p { color:#aaa; font-size:0.95rem; }
+
+        /* START SCREEN */
+        .start-screen { background:rgba(255,255,255,0.05); border-radius:16px; padding:40px 30px; text-align:center; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); }
+        .start-screen h2 { font-size:1.5rem; margin-bottom:20px; color:#fff; }
+        .section-cards { display:flex; gap:20px; margin:25px 0; flex-wrap:wrap; justify-content:center; }
+        .section-card { background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.15); border-radius:14px; padding:25px 20px; width:260px; cursor:pointer; transition:all 0.3s; }
+        .section-card:hover { border-color:#3a7bd5; transform:translateY(-4px); box-shadow:0 8px 30px rgba(58,123,213,0.3); }
+        .section-card.selected { border-color:#00d2ff; background:rgba(0,210,255,0.1); }
+        .section-card h3 { color:#00d2ff; margin-bottom:8px; font-size:1.1rem; }
+        .section-card .info { color:#aaa; font-size:0.85rem; line-height:1.6; }
+        .section-card .badge { display:inline-block; background:#3a7bd5; color:#fff; padding:3px 10px; border-radius:20px; font-size:0.75rem; margin-top:8px; }
+
+        /* TABS */
+        .tabs { display:flex; gap:0; margin-bottom:0; }
+        .tab { flex:1; padding:14px; text-align:center; background:rgba(255,255,255,0.05); cursor:pointer; transition:all 0.3s; border:1px solid rgba(255,255,255,0.1); font-weight:600; font-size:0.9rem; }
+        .tab:first-child { border-radius:12px 0 0 0; }
+        .tab:last-child { border-radius:0 12px 0 0; }
+        .tab.active { background:rgba(58,123,213,0.3); border-color:#3a7bd5; color:#fff; }
+        .tab:not(.active) { color:#888; }
+        .tab:hover:not(.active) { background:rgba(255,255,255,0.08); }
+
+        /* TIMER */
+        .timer-bar { display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.1); }
+        .timer { font-size:1.3rem; font-weight:700; font-family:'Courier New',monospace; }
+        .timer.warning { color:#ff6b6b; animation:pulse 1s ease infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .timer-controls { display:flex; gap:8px; }
+        .timer-btn { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; transition:all 0.2s; }
+        .timer-btn:hover { background:rgba(255,255,255,0.2); }
+        .question-counter { color:#aaa; font-size:0.9rem; }
+
+        /* QUIZ BODY */
+        .quiz-body { background:rgba(255,255,255,0.05); border-radius:0 0 16px 16px; padding:30px; border:1px solid rgba(255,255,255,0.1); border-top:none; min-height:400px; }
+        .question-card { display:none; animation:fadeIn 0.4s ease; }
+        .question-card.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        .q-number { display:inline-block; background:#3a7bd5; color:#fff; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; margin-bottom:15px; }
+        .q-text { font-size:1.1rem; line-height:1.8; color:#e8e8e8; margin-bottom:25px; }
+        .q-text .math { font-family:'Cambria Math','Times New Roman',serif; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-style:italic; }
+
+        /* OPTIONS */
+        .options { display:flex; flex-direction:column; gap:10px; }
+        .option { display:flex; align-items:center; padding:14px 18px; border:2px solid rgba(255,255,255,0.12); border-radius:12px; cursor:pointer; transition:all 0.25s; }
+        .option:hover { border-color:#3a7bd5; background:rgba(58,123,213,0.1); transform:translateX(4px); }
+        .option.selected { border-color:#00d2ff; background:rgba(0,210,255,0.12); }
+        .option.correct { border-color:#4ade80; background:rgba(74,222,128,0.15); color:#4ade80; }
+        .option.incorrect { border-color:#f87171; background:rgba(248,113,113,0.15); color:#f87171; }
+        .option-marker { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:#aaa; margin-right:14px; flex-shrink:0; transition:all 0.25s; }
+        .option.selected .option-marker { background:#00d2ff; color:#000; }
+        .option.correct .option-marker { background:#4ade80; color:#000; }
+        .option.incorrect .option-marker { background:#f87171; color:#fff; }
+        .option-text { font-size:1rem; }
+
+        /* EXPLANATION */
+        .explanation { display:none; margin-top:20px; padding:20px; background:rgba(58,123,213,0.1); border-left:4px solid #3a7bd5; border-radius:0 12px 12px 0; }
+        .explanation.show { display:block; animation:fadeIn 0.4s ease; }
+        .explanation h4 { color:#00d2ff; margin-bottom:10px; font-size:0.9rem; }
+        .explanation p { color:#ccc; line-height:1.7; font-size:0.92rem; }
+        .explanation .step { font-family:'Cambria Math','Times New Roman',serif; background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:6px; display:inline-block; margin:2px; }
+
+        /* NAV */
+        .nav-buttons { display:flex; justify-content:space-between; margin-top:25px; gap:12px; }
+        .btn { padding:12px 28px; border:none; border-radius:10px; font-size:0.95rem; font-weight:600; cursor:pointer; transition:all 0.25s; }
+        .btn-prev { background:rgba(255,255,255,0.1); color:#ccc; border:1px solid rgba(255,255,255,0.2); }
+        .btn-prev:hover { background:rgba(255,255,255,0.15); }
+        .btn-next { background:linear-gradient(135deg,#3a7bd5,#00d2ff); color:#fff; margin-left:auto; }
+        .btn-next:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(58,123,213,0.4); }
+        .btn-submit { background:linear-gradient(135deg,#4ade80,#22c55e); color:#fff; margin-left:auto; padding:14px 35px; }
+        .btn-submit:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(74,222,128,0.4); }
+        .btn-start { background:linear-gradient(135deg,#3a7bd5,#00d2ff); color:#fff; padding:16px 50px; font-size:1.1rem; margin-top:20px; border-radius:12px; }
+        .btn-start:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(58,123,213,0.4); }
+        .btn-restart { background:linear-gradient(135deg,#3a7bd5,#764ba2); color:#fff; padding:14px 40px; font-size:1.05rem; }
+        .btn-restart:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(118,75,162,0.4); }
+        .hidden { display:none !important; }
+
+        /* RESULTS */
+        .results { display:none; text-align:center; padding:40px 30px; animation:fadeIn 0.5s ease; }
+        .results.active { display:block; }
+        .results-icon { font-size:3.5rem; margin-bottom:15px; }
+        .results h2 { font-size:1.6rem; color:#fff; margin-bottom:10px; }
+        .score-text { font-size:3rem; font-weight:800; background:linear-gradient(90deg,#00d2ff,#4ade80); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:15px 0; }
+        .score-detail { color:#aaa; font-size:1rem; margin-bottom:8px; }
+        .score-message { font-size:1rem; color:#ccc; margin:15px 0 25px; padding:15px; background:rgba(255,255,255,0.05); border-radius:12px; line-height:1.6; }
+
+        .results-section { margin-top:30px; text-align:left; }
+        .results-section h3 { color:#00d2ff; margin-bottom:15px; font-size:1.05rem; }
+        .result-card { background:rgba(255,255,255,0.05); border-radius:10px; padding:14px 18px; margin-bottom:8px; border-left:4px solid; display:flex; justify-content:space-between; align-items:center; }
+        .result-card.correct { border-color:#4ade80; }
+        .result-card.incorrect { border-color:#f87171; }
+        .result-card .rc-label { font-weight:600; font-size:0.9rem; }
+        .result-card .rc-status { font-size:0.8rem; padding:3px 10px; border-radius:20px; }
+        .result-card.correct .rc-status { background:rgba(74,222,128,0.2); color:#4ade80; }
+        .result-card.incorrect .rc-status { background:rgba(248,113,113,0.2); color:#f87171; }
+
+        .progress-fill { height:100%; background:linear-gradient(90deg,#3a7bd5,#00d2ff); transition:width 0.3s ease; border-radius:0 4px 4px 0; }
+        .progress-bar { width:100%; height:4px; background:rgba(255,255,255,0.1); }
+
+        .mode-badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:600; margin-bottom:10px; }
+        .mode-badge.no-calc { background:rgba(248,113,113,0.2); color:#f87171; border:1px solid rgba(248,113,113,0.3); }
+        .mode-badge.calc { background:rgba(74,222,128,0.2); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
+
+        .section-divider { display:none; padding:30px; text-align:center; background:rgba(255,255,255,0.03); border-radius:12px; margin:20px 0; border:1px dashed rgba(255,255,255,0.15); }
+        .section-divider h3 { color:#00d2ff; margin-bottom:8px; }
+        .section-divider p { color:#aaa; font-size:0.9rem; }
+
+        /* FOOTER */
+        .footer { text-align:center; padding:25px 20px; margin-top:30px; color:#666; font-size:0.8rem; border-top:1px solid rgba(255,255,255,0.08); }
+        .footer .author { color:#aaa; font-size:0.85rem; margin-bottom:5px; }
+        .footer .copyright { color:#555; font-size:0.75rem; }
+
+        /* SECURITY WATERMARK */
+        .watermark { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-35deg); font-size:3rem; color:rgba(255,255,255,0.03); pointer-events:none; z-index:9999; white-space:nowrap; font-weight:700; letter-spacing:5px; user-select:none; }
+
+        @media(max-width:600px) {
+            .container { padding:10px; }
+            .header h1 { font-size:1.4rem; }
+            .section-cards { flex-direction:column; align-items:center; }
+            .section-card { width:100%; }
+            .quiz-body { padding:20px; }
+            .q-text { font-size:1rem; }
+            .tabs { font-size:0.8rem; }
+            .tab { padding:10px 8px; font-size:0.78rem; }
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2d3561 0%, #1e2243 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.8;
-            font-size: 0.95rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #4ade80;
-            transition: width 0.3s ease;
-        }
-
-        .quiz-body {
-            padding: 30px;
-        }
-
-        .question-card {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .question-card.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .question-number {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .question-text {
-            font-size: 1.15rem;
-            line-height: 1.7;
-            color: #1e293b;
-            margin-bottom: 25px;
-            font-weight: 500;
-        }
-
-        .question-text .math {
-            font-family: 'Cambria Math', 'Times New Roman', serif;
-            font-style: italic;
-            background: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 1.05rem;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option {
-            display: flex;
-            align-items: center;
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            font-size: 1rem;
-            color: #334155;
-        }
-
-        .option:hover {
-            border-color: #667eea;
-            background: #f0f0ff;
-            transform: translateX(5px);
-        }
-
-        .option.selected {
-            border-color: #667eea;
-            background: #eef2ff;
-            font-weight: 600;
-        }
-
-        .option.correct {
-            border-color: #22c55e;
-            background: #f0fdf4;
-            color: #166534;
-        }
-
-        .option.incorrect {
-            border-color: #ef4444;
-            background: #fef2f2;
-            color: #991b1b;
-        }
-
-        .option-marker {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-right: 14px;
-            flex-shrink: 0;
-            transition: all 0.25s ease;
-        }
-
-        .option.selected .option-marker {
-            background: #667eea;
-            color: white;
-        }
-
-        .option.correct .option-marker {
-            background: #22c55e;
-            color: white;
-        }
-
-        .option.incorrect .option-marker {
-            background: #ef4444;
-            color: white;
-        }
-
-        .explanation {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border-left: 4px solid #667eea;
-            border-radius: 0 12px 12px 0;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .explanation.show {
-            display: block;
-        }
-
-        .explanation h4 {
-            color: #1e40af;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-
-        .explanation p {
-            color: #334155;
-            line-height: 1.7;
-            font-size: 0.95rem;
-        }
-
-        .explanation .math-step {
-            font-family: 'Cambria Math', 'Times New Roman', serif;
-            background: white;
-            padding: 3px 10px;
-            border-radius: 6px;
-            display: inline-block;
-            margin: 3px 2px;
-            border: 1px solid #cbd5e1;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 12px 28px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .btn-prev {
-            background: #e2e8f0;
-            color: #475569;
-        }
-
-        .btn-prev:hover {
-            background: #cbd5e1;
-        }
-
-        .btn-next {
-            background: #667eea;
-            color: white;
-            margin-left: auto;
-        }
-
-        .btn-next:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-            margin-left: auto;
-            font-size: 1.05rem;
-            padding: 14px 35px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-        }
-
-        .btn-restart {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 14px 35px;
-            font-size: 1.05rem;
-        }
-
-        .btn-restart:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .results {
-            display: none;
-            text-align: center;
-            padding: 40px 30px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .results.active {
-            display: block;
-        }
-
-        .results-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .results h2 {
-            font-size: 1.8rem;
-            color: #1e293b;
-            margin-bottom: 10px;
-        }
-
-        .results .score-text {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 20px 0;
-        }
-
-        .results .score-detail {
-            color: #64748b;
-            font-size: 1.05rem;
-            margin-bottom: 10px;
-        }
-
-        .results .message {
-            font-size: 1.1rem;
-            color: #334155;
-            margin: 20px 0 30px;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 12px;
-        }
-
-        .distractor-info {
-            margin-top: 30px;
-            text-align: left;
-        }
-
-        .distractor-info h3 {
-            color: #1e293b;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        .distractor-card {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
-            border-left: 4px solid #667eea;
-        }
-
-        .distractor-card h4 {
-            color: #475569;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-
-        .distractor-card p {
-            color: #334155;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 12px;
-                margin: 10px;
-            }
-            .header { padding: 20px; }
-            .header h1 { font-size: 1.3rem; }
-            .quiz-body { padding: 20px; }
-            .question-text { font-size: 1rem; }
-            .btn { padding: 10px 20px; font-size: 0.9rem; }
-            .results .score-text { font-size: 2.2rem; }
+        /* PRINT PROTECTION */
+        @media print {
+            body { display:none !important; }
+            body::before { content:"PROTEGIDO - Prof. Mag. Ing. Carlos Marcelo Vera Irala. Impresion no permitida."; display:block; text-align:center; padding:50px; font-size:20px; color:red; }
         }
     </style>
 </head>
@@ -373,378 +150,817 @@
 
 <div class="container">
     <div class="header">
-        <h1>Test de Matemáticas SAT</h1>
-        <p>Ximena — 5 Preguntas de Seleccion Multiple</p>
-    </div>
-    <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+        <h1>MATH TEST SAT</h1>
+        <p>Ximena — Plataforma de Practica</p>
+        <p style="color:#555;font-size:0.75rem;margin-top:8px;font-style:italic;">Preparado por: Prof. Mag. Ing. Carlos Marcelo Vera Irala</p>
     </div>
 
-    <div class="quiz-body" id="quizBody">
-
-        <!-- Pregunta 1 -->
-        <div class="question-card active" data-question="0">
-            <span class="question-number">Pregunta 1 de 5</span>
-            <p class="question-text">
-                Si <span class="math">3x + 7 = 22</span>, ¿cuál es el valor de <span class="math">6x + 4</span>?
-            </p>
-            <div class="options">
-                <div class="option" onclick="selectOption(this, 0)">
-                    <span class="option-marker">A</span>
-                    <span>26</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 0)">
-                    <span class="option-marker">B</span>
-                    <span>30</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 0)">
-                    <span class="option-marker">C</span>
-                    <span>34</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 0)">
-                    <span class="option-marker">D</span>
-                    <span>38</span>
-                </div>
+    <!-- START SCREEN -->
+    <div class="start-screen" id="startScreen">
+        <h2>Elige una seccion para comenzar</h2>
+        <div class="section-cards">
+            <div class="section-card" onclick="selectSection('noCalc')">
+                <h3>Section 3</h3>
+                <p>Math (No Calculator)</p>
+                <p class="info">20 preguntas<br>Sin calculadora<br>Tiempo: 25 minutos</p>
+                <span class="badge">NO CALCULATOR</span>
             </div>
-            <div class="explanation" id="exp0">
-                <h4>Explicacion:</h4>
-                <p>
-                    Primero resolvemos para <span class="math-step">x</span>:<br>
-                    <span class="math-step">3x + 7 = 22</span> &rarr; <span class="math-step">3x = 15</span> &rarr; <span class="math-step">x = 5</span><br><br>
-                    Ahora sustituimos en la expresion <span class="math-step">6x + 4</span>:<br>
-                    <span class="math-step">6(5) + 4 = 30 + 4 = 34</span><br><br>
-                    <strong>Respuesta: C) 34</strong>
-                </p>
+            <div class="section-card" onclick="selectSection('calc')">
+                <h3>Section 4</h3>
+                <p>Math (Calculator)</p>
+                <p class="info">38 preguntas<br>Con calculadora<br>Tiempo: 55 minutos</p>
+                <span class="badge">CALCULATOR</span>
             </div>
         </div>
-
-        <!-- Pregunta 2 -->
-        <div class="question-card" data-question="1">
-            <span class="question-number">Pregunta 2 de 5</span>
-            <p class="question-text">
-                Un estudiante obtuvo calificaciones de <span class="math">85, 90, 78, 92</span> y <span class="math">80</span> en cinco examenes. ¿Cual es la media aritmetica de sus calificaciones?
-            </p>
-            <div class="options">
-                <div class="option" onclick="selectOption(this, 1)">
-                    <span class="option-marker">A</span>
-                    <span>82</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 1)">
-                    <span class="option-marker">B</span>
-                    <span>83</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 1)">
-                    <span class="option-marker">C</span>
-                    <span>84</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 1)">
-                    <span class="option-marker">D</span>
-                    <span>85</span>
-                </div>
-            </div>
-            <div class="explanation" id="exp1">
-                <h4>Explicacion:</h4>
-                <p>
-                    La media aritmetica es la suma de todos los valores dividida entre la cantidad de valores:<br>
-                    <span class="math-step">Media = (85 + 90 + 78 + 92 + 80) / 5</span><br>
-                    <span class="math-step">Media = 425 / 5 = 85</span><br><br>
-                    <strong>Respuesta: D) 85</strong>
-                </p>
-            </div>
-        </div>
-
-        <!-- Pregunta 3 -->
-        <div class="question-card" data-question="2">
-            <span class="question-number">Pregunta 3 de 5</span>
-            <p class="question-text">
-                Un rectangulo tiene un perimetro de <span class="math">36 cm</span>. Si el largo es el doble del ancho, ¿cual es el area del rectangulo?
-            </p>
-            <div class="options">
-                <div class="option" onclick="selectOption(this, 2)">
-                    <span class="option-marker">A</span>
-                    <span>48 cm²</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 2)">
-                    <span class="option-marker">B</span>
-                    <span>54 cm²</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 2)">
-                    <span class="option-marker">C</span>
-                    <span>72 cm²</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 2)">
-                    <span class="option-marker">D</span>
-                    <span>96 cm²</span>
-                </div>
-            </div>
-            <div class="explanation" id="exp2">
-                <h4>Explicacion:</h4>
-                <p>
-                    Sea el ancho <span class="math-step">w</span> y el largo <span class="math-step">l = 2w</span>.<br>
-                    Perimetro: <span class="math-step">2(l + w) = 36</span> &rarr; <span class="math-step">2(2w + w) = 36</span> &rarr; <span class="math-step">6w = 36</span> &rarr; <span class="math-step">w = 6 cm</span><br>
-                    Largo: <span class="math-step">l = 2(6) = 12 cm</span><br>
-                    Area: <span class="math-step">l × w = 12 × 6 = 72 cm²</span><br><br>
-                    <strong>Respuesta: C) 72 cm²</strong>
-                </p>
-            </div>
-        </div>
-
-        <!-- Pregunta 4 -->
-        <div class="question-card" data-question="3">
-            <span class="question-number">Pregunta 4 de 5</span>
-            <p class="question-text">
-                Si <span class="math">f(x) = 2x² - 3x + 1</span>, ¿cuál es el valor de <span class="math">f(-2)</span>?
-            </p>
-            <div class="options">
-                <div class="option" onclick="selectOption(this, 3)">
-                    <span class="option-marker">A</span>
-                    <span>15</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 3)">
-                    <span class="option-marker">B</span>
-                    <span>3</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 3)">
-                    <span class="option-marker">C</span>
-                    <span>-1</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 3)">
-                    <span class="option-marker">D</span>
-                    <span>-13</span>
-                </div>
-            </div>
-            <div class="explanation" id="exp3">
-                <h4>Explicacion:</h4>
-                <p>
-                    Sustituimos <span class="math-step">x = -2</span> en la funcion:<br>
-                    <span class="math-step">f(-2) = 2(-2)² - 3(-2) + 1</span><br>
-                    <span class="math-step">= 2(4) + 6 + 1</span><br>
-                    <span class="math-step">= 8 + 6 + 1 = 15</span><br><br>
-                    <strong>Respuesta: A) 15</strong>
-                </p>
-            </div>
-        </div>
-
-        <!-- Pregunta 5 -->
-        <div class="question-card" data-question="4">
-            <span class="question-number">Pregunta 5 de 5</span>
-            <p class="question-text">
-                Un carro viaja a <span class="math">60 km/h</span> durante <span class="math">2.5 horas</span> y luego a <span class="math">80 km/h</span> durante <span class="math">1.5 horas</span>. ¿Cuál es la distancia total recorrida?
-            </p>
-            <div class="options">
-                <div class="option" onclick="selectOption(this, 4)">
-                    <span class="option-marker">A</span>
-                    <span>240 km</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 4)">
-                    <span class="option-marker">B</span>
-                    <span>250 km</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 4)">
-                    <span class="option-marker">C</span>
-                    <span>270 km</span>
-                </div>
-                <div class="option" onclick="selectOption(this, 4)">
-                    <span class="option-marker">D</span>
-                    <span>290 km</span>
-                </div>
-            </div>
-            <div class="explanation" id="exp4">
-                <h4>Explicacion:</h4>
-                <p>
-                    Usamos la formula <span class="math-step">distancia = velocidad × tiempo</span>:<br>
-                    Primer tramo: <span class="math-step">60 × 2.5 = 150 km</span><br>
-                    Segundo tramo: <span class="math-step">80 × 1.5 = 120 km</span><br>
-                    Distancia total: <span class="math-step">150 + 120 = 270 km</span><br><br>
-                    <strong>Respuesta: C) 270 km</strong>
-                </p>
-            </div>
-        </div>
-
-        <!-- Navegacion -->
-        <div class="nav-buttons" id="navButtons">
-            <button class="btn btn-prev hidden" id="btnPrev" onclick="prevQuestion()">Anterior</button>
-            <button class="btn btn-next" id="btnNext" onclick="nextQuestion()">Siguiente</button>
-        </div>
+        <button class="btn btn-start" id="btnStart" onclick="startQuiz()" disabled>Comenzar Test</button>
+        <p style="color:#666;font-size:0.8rem;margin-top:15px;">Los valores cambian en cada intento. Las posiciones de las respuestas se aleatorizan.</p>
     </div>
 
-    <!-- Resultados -->
-    <div class="results" id="results">
-        <div class="results-icon" id="resultsIcon"></div>
-        <h2>Resultados del Test</h2>
-        <div class="score-text" id="scoreText"></div>
-        <div class="score-detail" id="scoreDetail"></div>
-        <div class="message" id="scoreMessage"></div>
+    <!-- QUIZ AREA (hidden initially) -->
+    <div id="quizArea" class="hidden">
+        <div class="tabs" id="tabsArea"></div>
+        <div class="timer-bar">
+            <div class="timer" id="timerDisplay">25:00</div>
+            <div class="question-counter" id="qCounter">1 / 20</div>
+            <div class="timer-controls">
+                <button class="timer-btn" id="btnPause" onclick="togglePause()">Pausa</button>
+            </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div class="quiz-body" id="quizBody"></div>
+    </div>
 
-        <div class="distractor-info" id="distractorInfo"></div>
+    <!-- RESULTS -->
+    <div class="results" id="resultsArea"></div>
 
-        <button class="btn btn-restart" onclick="restartQuiz()">Volver a Intentar</button>
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="author">Prof. Mag. Ing. Carlos Marcelo Vera Irala</div>
+        <div class="copyright">Material exclusivo para uso educativo. Todos los derechos reservados.</div>
     </div>
 </div>
 
-<script>
-    const answers = [2, 3, 2, 0, 2]; // indices correctos (0-based): C, D, C, A, C
-    const userAnswers = [-1, -1, -1, -1, -1];
-    let currentQuestion = 0;
-    const totalQuestions = 5;
+<!-- SECURITY WATERMARK -->
+<div class="watermark" id="watermark">PROF. CARLOS VERA IRALA</div>
 
-    function selectOption(el, qIndex) {
-        const card = document.querySelector(`.question-card[data-question="${qIndex}"]`);
-        const options = card.querySelectorAll('.option');
-        options.forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        userAnswers[qIndex] = Array.from(options).indexOf(el);
-        updateNavButtons();
+<script>
+// ============================================================
+// SECURITY - Anti-copy and protection
+// ============================================================
+(function(){
+    // Disable right-click
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); return false; });
+
+    // Disable text selection on key elements
+    document.addEventListener('selectstart', function(e){
+        if(e.target.closest('.q-text, .option-text, .explanation')){ e.preventDefault(); return false; }
+    });
+
+    // Disable copy
+    document.addEventListener('copy', function(e){ e.preventDefault(); return false; });
+
+    // Disable cut
+    document.addEventListener('cut', function(e){ e.preventDefault(); return false; });
+
+    // Disable paste
+    document.addEventListener('paste', function(e){ e.preventDefault(); return false; });
+
+    // Disable F12, Ctrl+U, Ctrl+Shift+I, Ctrl+S, Ctrl+P
+    document.addEventListener('keydown', function(e){
+        if(e.key==='F12'){ e.preventDefault(); return false; }
+        if(e.ctrlKey && e.key==='u'){ e.preventDefault(); return false; }
+        if(e.ctrlKey && e.shiftKey && (e.key==='I'||e.key==='i')){ e.preventDefault(); return false; }
+        if(e.ctrlKey && e.key==='s'){ e.preventDefault(); return false; }
+        if(e.ctrlKey && e.key==='p'){ e.preventDefault(); return false; }
+        if(e.ctrlKey && e.key==='a'){ e.preventDefault(); return false; }
+        if(e.ctrlKey && e.key==='c'){ e.preventDefault(); return false; }
+    });
+
+    // Disable drag
+    document.addEventListener('dragstart', function(e){ e.preventDefault(); return false; });
+
+    // Disable image saving
+    document.addEventListener('mousedown', function(e){
+        if(e.target.tagName==='IMG'){ e.preventDefault(); return false; }
+    });
+
+    // Rotate watermark text
+    let wm = document.getElementById('watermark');
+    if(wm){
+        let names = ['PROF. CARLOS VERA IRALA','CARLOS MARCELO VERA IRALA','ALL RIGHTS RESERVED'];
+        let idx = 0;
+        setInterval(function(){
+            idx = (idx+1) % names.length;
+            wm.textContent = names[idx];
+        }, 8000);
     }
 
-    function updateNavButtons() {
-        const btnNext = document.getElementById('btnNext');
-        const btnPrev = document.getElementById('btnPrev');
+    // Console warning
+    console.log('%c PROTEGIDO - Prof. Mag. Ing. Carlos Marcelo Vera Irala ', 'background:#1e293b;color:#00d2ff;font-size:16px;padding:10px;border-radius:8px;font-weight:bold;');
+    console.log('%c Este material esta protegido. Unauthorized copying is prohibited. ', 'color:#f87171;font-size:12px;');
 
-        btnPrev.classList.toggle('hidden', currentQuestion === 0);
-
-        if (currentQuestion === totalQuestions - 1) {
-            if (userAnswers.every(a => a !== -1)) {
-                btnNext.textContent = 'Enviar Respuestas';
-                btnNext.className = 'btn btn-submit';
-                btnNext.onclick = submitQuiz;
-            } else {
-                btnNext.textContent = 'Siguiente';
-                btnNext.className = 'btn btn-next';
-                btnNext.onclick = nextQuestion;
+    // Disable console in dev tools (basic)
+    let devtools = {open: false, orientation: null};
+    let threshold = 160;
+    setInterval(function(){
+        if(window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold){
+            if(!devtools.open){
+                devtools.open = true;
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0c29;color:#fff;font-family:sans-serif;text-align:center;padding:20px;"><div><h1 style="color:#f87171;margin-bottom:15px;">Acceso Restringido</h1><p style="color:#aaa;">Las herramientas de desarrollo estan deshabilitadas.</p><p style="color:#666;margin-top:10px;">Prof. Mag. Ing. Carlos Marcelo Vera Irala</p></div></div>';
             }
         } else {
-            btnNext.textContent = 'Siguiente';
-            btnNext.className = 'btn btn-next';
-            btnNext.onclick = nextQuestion;
+            devtools.open = false;
         }
-    }
-
-    function nextQuestion() {
-        if (currentQuestion < totalQuestions - 1) {
-            document.querySelector('.question-card.active').classList.remove('active');
-            currentQuestion++;
-            document.querySelector(`.question-card[data-question="${currentQuestion}"]`).classList.add('active');
-            updateProgress();
-            updateNavButtons();
-        }
-    }
-
-    function prevQuestion() {
-        if (currentQuestion > 0) {
-            document.querySelector('.question-card.active').classList.remove('active');
-            currentQuestion--;
-            document.querySelector(`.question-card[data-question="${currentQuestion}"]`).classList.add('active');
-            updateProgress();
-            updateNavButtons();
-        }
-    }
-
-    function updateProgress() {
-        const pct = ((currentQuestion + 1) / totalQuestions) * 100;
-        document.getElementById('progressFill').style.width = pct + '%';
-    }
-
-    function submitQuiz() {
-        let score = 0;
-        const results = [];
-
-        for (let i = 0; i < totalQuestions; i++) {
-            const card = document.querySelector(`.question-card[data-question="${i}"]`);
-            const options = card.querySelectorAll('.option');
-            const correctIdx = answers[i];
-            const userIdx = userAnswers[i];
-
-            options.forEach((opt, idx) => {
-                opt.style.pointerEvents = 'none';
-                if (idx === correctIdx) {
-                    opt.classList.add('correct');
-                }
-                if (idx === userIdx && idx !== correctIdx) {
-                    opt.classList.add('incorrect');
-                }
-            });
-
-            card.querySelector('.explanation').classList.add('show');
-
-            const isCorrect = userIdx === correctIdx;
-            if (isCorrect) score++;
-
-            results.push({
-                question: i + 1,
-                correct: isCorrect,
-                userAnswer: userIdx,
-                correctAnswer: correctIdx
-            });
-        }
-
-        document.getElementById('navButtons').classList.add('hidden');
-        showResults(score, results);
-    }
-
-    function showResults(score, results) {
-        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.classList.add('active');
-
-        const pct = Math.round((score / totalQuestions) * 100);
-        document.getElementById('scoreText').textContent = `${score} / ${totalQuestions}`;
-        document.getElementById('scoreDetail').textContent = `Puntuacion: ${pct}%`;
-
-        const icons = document.getElementById('resultsIcon');
-        const msg = document.getElementById('scoreMessage');
-
-        if (score === 5) {
-            icons.textContent = 'Perfecto';
-            msg.textContent = 'Excelente! Respuestas perfectas. Ximena esta muy bien preparada.';
-        } else if (score >= 3) {
-            icons.textContent = 'Buen trabajo';
-            msg.textContent = 'Buen resultado! Revisa las explicaciones de las preguntas que fallaste para reforzar los conceptos.';
-        } else {
-            icons.textContent = 'Sigue practicando';
-            msg.textContent = 'No te preocupes. Revisa cada explicacion detenidamente y vuelve a intentarlo. La practica hace al maestro!';
-        }
-
-        let html = '<h3>Resumen por Pregunta</h3>';
-        results.forEach(r => {
-            const status = r.correct ? 'Correcta' : 'Incorrecta';
-            const color = r.correct ? '#22c55e' : '#ef4444';
-            const optionsLabels = ['A', 'B', 'C', 'D'];
-            html += `
-                <div class="distractor-card">
-                    <h4 style="color:${color}">Pregunta ${r.question} — ${status}</h4>
-                    <p>Tu respuesta: ${optionsLabels[r.userAnswer]} | Respuesta correcta: ${optionsLabels[r.correctAnswer]}</p>
-                </div>
-            `;
-        });
-
-        document.getElementById('distractorInfo').innerHTML = html;
-    }
-
-    function restartQuiz() {
-        userAnswers.fill(-1);
-        currentQuestion = 0;
-
-        document.querySelectorAll('.option').forEach(opt => {
-            opt.classList.remove('selected', 'correct', 'incorrect');
-            opt.style.pointerEvents = 'auto';
-        });
-        document.querySelectorAll('.explanation').forEach(e => e.classList.remove('show'));
-
-        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
-        document.querySelector('.question-card[data-question="0"]').classList.add('active');
-
-        document.getElementById('results').classList.remove('active');
-        document.getElementById('navButtons').classList.remove('hidden');
-        document.getElementById('navButtons').style.display = 'flex';
-
-        updateProgress();
-        updateNavButtons();
-    }
-
-    updateProgress();
-    updateNavButtons();
+    }, 1000);
+})();
 </script>
 
+<script>
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function randFloat(a,b){ return +(Math.random()*(b-a)+a).toFixed(1); }
+function shuffle(arr){ let a=[...arr]; for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function makeMC(correctText, wrongTexts, explanation){
+    let options = [{text:String(correctText), correct:true}, ...wrongTexts.map(t=>({text:String(t), correct:false}))];
+    options = shuffle(options);
+    let correctIdx = options.findIndex(o=>o.correct);
+    return { options: options.map(o=>o.text), correctIdx, explanation };
+}
+
+function makeNumeric(correctVal, explanation){
+    let wrongs = new Set();
+    let cv = Number(correctVal);
+    while(wrongs.size<3){
+        let offset = pick([-5,-3,-2,-1,1,2,3,5,10]);
+        let w = cv + offset;
+        if(w!==cv && w>=0) wrongs.add(w);
+    }
+    let options = [String(cv), ...[...wrongs].map(String)];
+    options = shuffle(options);
+    let correctIdx = options.indexOf(String(cv));
+    return { options, correctIdx, explanation };
+}
+
+// ============================================================
+// SECTION 3: NO CALCULATOR (20 questions)
+// ============================================================
+function genNoCalc(){
+    let Q = [];
+
+    // Q1: Linear equation
+    { let a=randInt(2,6), b=randInt(1,8), c=randInt(10,30);
+      let x=(c-b)/a; let wrongs=[x+randInt(1,3), x-randInt(1,3), x*2];
+      Q.push({ text:`Si <span class="math">${a}x + ${b} = ${c}</span>, cual es el valor de <span class="math">x</span>?`,
+        ...makeMC(x, wrongs, `Resolvemos: ${a}x = ${c}-${b} = ${c-b}, entonces x = ${c-b}/${a} = ${x}`)});}
+
+    // Q2: System of equations
+    { let x=randInt(2,7), y=randInt(1,5);
+      let a1=randInt(1,3), b1=randInt(1,3), c1=a1*x+b1*y;
+      let a2=randInt(1,3), b2=randInt(1,3); while(a1*b2===a2*b1){a2=randInt(1,3);b2=randInt(1,3);}
+      let c2=a2*x+b2*y;
+      let wrongs=[`x=${x+1}, y=${y}`, `x=${x}, y=${y+1}`, `x=${x-1}, y=${y+1}`];
+      Q.push({ text:`Si <span class="math">${a1}x + ${b1}y = ${c1}</span> y <span class="math">${a2}x + ${b2}y = ${c2}</span>, cual es el valor de <span class="math">x</span>?`,
+        ...makeMC(x, wrongs, `Sistema de ecuaciones. Usando sustitucion o eliminacion: x = ${x}`)});}
+
+    // Q3: Exponent rules
+    { let base=randInt(2,5), p=randInt(2,4), q=randInt(1,3);
+      let ans=Math.pow(base,p-q); let wrongs=[Math.pow(base,p+q), base*p, Math.pow(base,q)];
+      Q.push({ text:`Simplifica: <span class="math">${base}^${p} / ${base}^${q}</span>`,
+        ...makeMC(`${base}^${p-q}`, wrongs.map(w=>`${base}^${w}`), `Usando la regla de exponentes: ${base}^${p}/${base}^${q} = ${base}^${p-q} = ${ans}`)});}
+
+    // Q4: Quadratic
+    { let r1=randInt(1,4), r2=randInt(-4,-1);
+      let sum=r1+r2, prod=r1*r2;
+      Q.push({ text:`Cuales son las raices de <span class="math">x^2 ${sum>=0?'+':''}${sum}x + (${prod}) = 0</span>?`,
+        ...makeMC(`${r1} y ${r2}`, [`${r1} y ${-r2}`, `${-r1} y ${r2}`, `${-r1} y ${-r2}`],
+        `Factorizando: (x-${r1})(x-${r2>=0?'+':''}${r2}) = 0, raices: x=${r1}, x=${r2}`)});}
+
+    // Q5: Absolute value
+    { let a=randInt(2,8), b=randInt(1,10), op=pick(['+', '-']);
+      let ans = op==='+' ? b-a : a+b;
+      let wrongs=[a+b, Math.abs(a-b), a*b];
+      if(op==='-') wrongs=[b-a>0?b-a:a-b, a+1, b-1];
+      Q.push({ text:`Resuelve: <span class="math">|x - ${a}| = ${b}</span>. Si <span class="math">x > 0</span>, cual es el valor de <span class="math">x</span>?`,
+        ...makeMC(a+b, [a-b>0?a-b:b-a, a, b],
+        `Si x>${a}: x-${a}=${b} → x=${a+b}. Si x<${a}: ${a}-x=${b} → x=${a-b}. Como x>0: x=${a+b}`)});}
+
+    // Q6: Percent
+    { let whole=randInt(50,200), pct=randInt(10,40);
+      let part=Math.round(whole*pct/100);
+      Q.push({ text:`¿Cuanto es el <span class="math">${pct}%</span> de <span class="math">${whole}</span>?`,
+        ...makeMC(part, [part+randInt(2,8), part-randInt(1,5), Math.round(whole*pct/10)],
+        `${pct}% de ${whole} = ${pct}/100 × ${whole} = ${part}`)});}
+
+    // Q7: Fraction operation
+    { let num1=randInt(1,5), den1=pick([2,3,4,5,6]);
+      let num2=randInt(1,4), den2=pick([2,3,4,5,6]); while(den1===den2){den2=pick([2,3,4,5,6]);}
+      let resNum=num1*den2+num2*den1, resDen=den1*den2;
+      let g=Math.floor(Math.sqrt(Math.min(resNum,resDen))); let rn=resNum, rd=resDen;
+      for(let i=g;i>=2;i--){ while(rn%i===0&&rd%i===0){rn/=i;rd/=i;}}
+      Q.push({ text:`Calcula: <span class="math">${num1}/${den1} + ${num2}/${den2}</span>`,
+        ...makeMC(`${rn}/${rd}`, [`${num1+num2}/${den1+den2}`, `${resNum}/${den1}`, `${num1*num2}/${den1*den2}`],
+        `SMM: ${den1}×${den2}=${den1*den2}. ${num1}×${den2}=${num1*den2} + ${num2}×${den1}=${num2*den1} = ${resNum}/${resDen} = ${rn}/${rd}`)});}
+
+    // Q8: Ratio
+    { let a=randInt(2,8), b=randInt(2,8);
+      let total=randInt(20,60);
+      let shareA=Math.round(a*total/(a+b));
+      Q.push({ text:`En una proporcion de <span class="math">${a}:${b}</span>, si el total es <span class="math">${total}</span>, cuanto es la primera parte?`,
+        ...makeMC(shareA, [total-shareA, a+b, total-a],
+        `Primera parte = ${a}/(${a}+${b}) × ${total} = ${a}/${a+b} × ${total} = ${shareA}`)});}
+
+    // Q9: Inequality
+    { let a=randInt(2,6), b=randInt(5,20);
+      let sol=Math.ceil(b/a);
+      Q.push({ text:`Resuelve: <span class="math">${a}x - ${b} > 0</span>. Cual es el menor entero solucion?`,
+        ...makeMC(sol, [sol+1, sol-1, sol+2],
+        `${a}x > ${b} → x > ${b}/${a} = ${(b/a).toFixed(1)}. El menor entero es ${sol}`)});}
+
+    // Q10: Function evaluation
+    { let a=randInt(2,5), b=randInt(1,8), x=randInt(1,4);
+      let ans=a*x*x+b;
+      let wrongs=[a*x+b, a*x*x-b, a*x+b*x];
+      Q.push({ text:`Si <span class="math">f(x) = ${a}x^2 + ${b}</span>, cual es <span class="math">f(${x})</span>?`,
+        ...makeMC(ans, wrongs, `f(${x}) = ${a}(${x})^2 + ${b} = ${a}×${x*x} + ${b} = ${ans}`)});}
+
+    // Q11: Slope
+    { let x1=randInt(-3,3), y1=randInt(-3,3), x2=x1+randInt(1,4), y2=randInt(-3,5); while(y2===y1){y2=randInt(-3,5);}
+      let num=y2-y1, den=x2-x1;
+      let g=Math.abs(num)>0&&Math.abs(den)>0? (function(){for(let i=Math.min(Math.abs(num),Math.abs(den));i>=2;i--){if(num%i===0&&den%i===0)return i;}return 1;})() : 1;
+      let sn=num/g, sd=den/g;
+      Q.push({ text:`Cual es la pendiente de la linea que pasa por <span class="math">(${x1}, ${y1})</span> y <span class="math">(${x2}, ${y2})</span>?`,
+        ...makeMC(sd===1?`${sn}`:`${sn}/${sd}`, [`${sd}/${sn}`, `${sn+1}/${sd}`, `${-sn}/${sd}`],
+        `Pendiente = (${y2}-${y1})/(${x2}-${x1}) = ${num}/${den} = ${sn}/${sd}`)});}
+
+    // Q12: Pythagorean
+    { let triples=[[3,4,5],[5,12,13],[8,15,17],[7,24,25]];
+      let t=pick(triples); let missing=pick([0,1,2]);
+      let q=`<span class="math">${missing===2?'a^2 + b^2 = c^2':missing===0?'a^2 + '+t[1]+'^2 = '+t[2]+'^2':t[0]+'^2 + a^2 = '+t[2]+'^2'}</span>`;
+      Q.push({ text:`En un triangulo rectangulo: ${q}. Cual es el valor de ${missing===2?'c':missing===0?'a':'b'}?`,
+        ...makeMC(t[missing], [t[missing]+1, t[missing]-1, t[(missing+1)%3]],
+        `Teorema de Pitagoras: ${t[0]}^2 + ${t[1]}^2 = ${t[2]}^2 → ${t[0]*t[0]} + ${t[1]*t[1]} = ${t[2]*t[2]}`)});}
+
+    // Q13: Polynomial
+    { let a=randInt(1,3), b=randInt(1,5);
+      Q.push({ text:`Si <span class="math">x^2 - ${a+b}x + ${a*b} = 0</span>, cual es la suma de las raices?`,
+        ...makeMC(a+b, [a*b, a-b, -(a+b)],
+        `Para ax^2+bx+c=0, suma de raices = -b/a. Aqui: -(-${a+b})/1 = ${a+b}`)});}
+
+    // Q14: Scientific notation
+    { let m=randFloat(1,9), e=randInt(2,5);
+      let val=m*Math.pow(10,e);
+      Q.push({ text:`Expresa <span class="math">${val.toLocaleString()}</span> en notacion cientifica.`,
+        ...makeMC(`${m} × 10^${e}`, [`${m} × 10^${e+1}`, `${m*10} × 10^${e-1}`, `${m/10} × 10^${e+1}`],
+        `${val} = ${m} × 10^${e}`)});}
+
+    // Q15: Average problem
+    { let n=randInt(4,6), avg=randInt(70,95);
+      let sum=avg*n, newAvg=avg+randInt(1,3);
+      let newSum=newAvg*(n+1);
+      let newVal=newSum-sum;
+      Q.push({ text:`El promedio de <span class="math">${n}</span> numeros es <span class="math">${avg}</span>. Si se agrega un nuevo numero y el promedio se vuelve <span class="math">${newAvg}</span>, ¿cuál es el nuevo numero?`,
+        ...makeMC(newVal, [newVal+5, newVal-3, avg],
+        `Suma actual = ${n}×${avg}=${sum}. Nueva suma = ${n+1}×${newAvg}=${newSum}. Nuevo numero = ${newSum}-${sum}=${newVal}`)});}
+
+    // Q16: Numeric - solve for expression
+    { let a=randInt(3,7), b=randInt(2,5), c=a*b;
+      let expr = a+b+c;
+      Q.push({ text:`Si <span class="math">a = ${a}</span> y <span class="math">b = ${b}</span>, calcula <span class="math">a + b + a·b</span>`,
+        ...makeNumeric(expr, `a + b + a·b = ${a} + ${b} + ${a}×${b} = ${a} + ${b} + ${a*b} = ${expr}`)});}
+
+    // Q17: Numeric - simple equation
+    { let x=randInt(5,20);
+      let expr = 2*x + 5;
+      Q.push({ text:`Si <span class="math">2x + 5 = ${expr}</span>, ¿cuál es <span class="math">x</span>?`,
+        ...makeNumeric(x, `2x = ${expr} - 5 = ${expr-5}, x = ${(expr-5)/2}`)});}
+
+    // Q18: Numeric - exponent
+    { let base=randInt(2,4), exp=randInt(2,3);
+      let ans=Math.pow(base,exp);
+      Q.push({ text:`Calcula: <span class="math">${base}^${exp}</span>`,
+        ...makeNumeric(ans, `${base}^${exp} = ${ans}`)});}
+
+    // Q19: Numeric - zero property
+    { let a=randInt(1,5);
+      Q.push({ text:`Si <span class="math">x(x - ${a}) = 0</span> y <span class="math">x ≠ 0</span>, ¿cuál es el valor de x?`,
+        ...makeNumeric(a, `Si x(x-${a})=0 y x≠0, entonces x-${a}=0 → x=${a}`)});}
+
+    // Q20: Numeric - average
+    { let nums=[]; for(let i=0;i<5;i++) nums.push(randInt(10,30));
+      let avg=Math.round(nums.reduce((s,v)=>s+v,0)/5);
+      Q.push({ text:`Calcula el promedio de: <span class="math">${nums.join(', ')}</span>`,
+        ...makeNumeric(avg, `Promedio = (${nums.join(' + ')})/5 = ${nums.reduce((s,v)=>s+v,0)}/5 = ${avg}`)});}
+
+    return Q;
+}
+
+// ============================================================
+// SECTION 4: CALCULATOR (38 questions)
+// ============================================================
+function genCalc(){
+    let Q = [];
+
+    // Q1: Linear model
+    { let m=randInt(2,8), b=randInt(10,50), x=randInt(5,20);
+      let ans=m*x+b;
+      Q.push({ text:`Un servicio cuesta <span class="math">$${b}</span> mas <span class="math">$${m}</span> por hora. ¿Cuanto cuesta <span class="math">${x}</span> horas?`,
+        ...makeMC(`$${ans}`, [`$${ans+10}`, `$${ans-m}`, `$${b+x}`],
+        `Costo = ${m}×${x} + ${b} = ${ans}`)});}
+
+    // Q2: System with decimals
+    { let x=randInt(3,10), y=randInt(1,8);
+      let a1=randInt(2,5), b1=randInt(1,4);
+      let a2=randInt(1,3), b2=randInt(2,5);
+      let c1=a1*x+b1*y, c2=a2*x+b2*y;
+      Q.push({ text:`Resuelve el sistema: <span class="math">${a1}x + ${b1}y = ${c1}</span> y <span class="math">${a2}x + ${b2}y = ${c2}</span>. ¿Cuál es <span class="math">y</span>?`,
+        ...makeMC(y, [y+1, y-1, x],
+        `Usando eliminacion: y = ${y}`)});}
+
+    // Q3: Percentage increase
+    { let orig=randInt(50,200), pct=randInt(5,30);
+      let newVal=Math.round(orig*(1+pct/100));
+      Q.push({ text:`Un precio sube <span class="math">${pct}%</span> de <span class="math">$${orig}</span>. ¿Cuál es el nuevo precio?`,
+        ...makeMC(`$${newVal}`, [`$${newVal+5}`, `$${orig+pct}`, `$${orig-pct}`],
+        `Nuevo precio = ${orig} × (1 + ${pct}/100) = ${orig} × ${(1+pct/100)} = $${newVal}`)});}
+
+    // Q4: Quadratic - vertex
+    { let a=randInt(1,3), h=randInt(-4,4), k=randInt(-5,5);
+      let b_coeff=-2*a*h, c_coeff=a*h*h+k;
+      Q.push({ text:`¿Cuál es el vertice de <span class="math">f(x) = ${a}x^2 ${b_coeff>=0?'+':''}${b_coeff}x ${c_coeff>=0?'+':''}${c_coeff}</span>?`,
+        ...makeMC(`(${h}, ${k})`, [`(${-h}, ${k})`, `(${h}, ${-k})`, `(${-h}, ${-k})`],
+        `x = -b/(2a) = ${-b_coeff}/${2*a} = ${h}. f(${h}) = ${k}. Vertice: (${h}, ${k})`)});}
+
+    // Q5: Exponential growth
+    { let P0=randInt(100,500), r=randInt(2,8), t=randInt(2,5);
+      let ans=Math.round(P0*Math.pow(1+r/100,t));
+      Q.push({ text:`Una poblacion inicial de <span class="math">${P0}</span> crece <span class="math">${r}%</span> anual. ¿Cuanto sera despues de <span class="math">${t}</span> años?`,
+        ...makeMC(ans, [P0+r*t, Math.round(P0*(1+r/100)), ans+100],
+        `P = ${P0}(1+${r}/100)^${t} = ${P0}×${(1+r/100).toFixed(2)}^${t} ≈ ${ans}`)});}
+
+    // Q6: Probability
+    { let total=randInt(20,50), favorable=randInt(3,Math.floor(total/2));
+      let pct=Math.round(favorable*100/total);
+      Q.push({ text:`De <span class="math">${total}</span> estudiantes, <span class="math">${favorable}</span>prefieren cafe. ¿Qué porcentaje?`,
+        ...makeMC(`${pct}%`, [`${pct+5}%`, `${Math.round(favorable/total*1000)/10}%`, `${total-favorable}%`],
+        `${favorable}/${total} × 100 = ${pct}%`)});}
+
+    // Q7: Mean from frequency
+    { let vals=[randInt(1,5), randInt(6,10), randInt(11,15)];
+      let freqs=[randInt(2,5), randInt(3,6), randInt(1,4)];
+      let totalF=freqs.reduce((s,v)=>s+v,0);
+      let totalS=vals.reduce((s,v,i)=>s+v*freqs[i],0);
+      let mean=+(totalS/totalF).toFixed(1);
+      Q.push({ text:`Datos: <span class="math">${vals[0]}</span> (freq ${freqs[0]}), <span class="math">${vals[1]}</span> (freq ${freqs[1]}), <span class="math">${vals[2]}</span> (freq ${freqs[2]}). ¿Media?`,
+        ...makeNumeric(mean, `Media = (${vals[0]}×${freqs[0]} + ${vals[1]}×${freqs[1]} + ${vals[2]}×${freqs[2]})/${totalF} = ${totalS}/${totalF} = ${mean}`)});}
+
+    // Q8: Standard deviation concept
+    { let nums=[]; for(let i=0;i<5;i++) nums.push(randInt(10,40));
+      let mean=nums.reduce((s,v)=>s+v,0)/5;
+      let variance=nums.reduce((s,v)=>s+(v-mean)**2,0)/5;
+      let sd=+Math.sqrt(variance).toFixed(2);
+      Q.push({ text:`Para los datos <span class="math">${nums.join(', ')}</span>, ¿cuál es la desviación estandar (poblacional)?`,
+        ...makeNumeric(sd, `Media = ${mean.toFixed(1)}. Varianza = Σ(xi-${mean.toFixed(1)})^2/5 = ${variance.toFixed(2)}. DE = √${variance.toFixed(2)} = ${sd}`)});}
+
+    // Q9: Line equation
+    { let m=randInt(1,5), b=randInt(-5,10);
+      Q.push({ text:`¿Cuál es la ecuacion de la linea con pendiente <span class="math">${m}</span> y intercepto <span class="math">${b>=0?'':'('}${b}${b>=0?'':')'}</span>?`,
+        ...makeMC(`y = ${m}x ${b>=0?'+':''}${b}`, [`y = ${m}x ${b>=0?'+':''}${b+2}`, `y = ${m+1}x ${b>=0?'+':''}${b}`, `y = ${m}x ${b>=0?'+':''}${b-3}`],
+        `y = mx + b = ${m}x ${b>=0?'+':''}${b}`)});}
+
+    // Q10: Area of composite shape
+    { let r=randInt(3,8);
+      let sqArea=r*r, circArea=+(Math.PI*r*r/4).toFixed(1);
+      let total=+(sqArea+circArea).toFixed(1);
+      Q.push({ text:`Un cuadrado de lado <span class="math">${r}</span> tiene un circulo inscrito. ¿Area total de ambas figuras?`,
+        ...makeNumeric(total, `Cuadrado = ${r}^2 = ${sqArea}. Circulo = π(${r})^2/4 ≈ ${circArea}. Total ≈ ${total}`)});}
+
+    // Q11: Ratio word problem
+    { let ratio1=randInt(2,5), ratio2=randInt(3,7);
+      let total=randInt(30,100);
+      let part1=Math.round(ratio1*total/(ratio1+ratio2));
+      Q.push({ text:`En una mezcla, la proporcion es <span class="math">${ratio1}:${ratio2}</span>. Si el total es <span class="math">${total}</span> litros, ¿cuantos litros de la primera parte?`,
+        ...makeMC(part1, [total-part1, ratio1*ratio2, ratio1+ratio2],
+        `Primera parte = ${ratio1}/(${ratio1}+${ratio2}) × ${total} = ${part1}`)});}
+
+    // Q12: Polynomial division
+    { let q=randInt(2,5), r=randInt(1,5);
+      let a=randInt(1,3), b=randInt(1,4);
+      // (ax+b)(x+q) + r
+      let c=a, d=a*q+b, e=b*q+r;
+      Q.push({ text:`Si <span class="math">${c}x^2 + ${d}x + ${e}</span> se divide entre <span class="math">(x + ${q})</span>, ¿cuál es el residuo?`,
+        ...makeNumeric(r, `Usando division sintetica con x = -${q}: residuo = ${r}`)});}
+
+    // Q13: Inequality system
+    { let a=randInt(1,4), b=randInt(1,5);
+      let x=randInt(5,15);
+      Q.push({ text:`¿Para cuantos enteros positivos <span class="math">x ≤ ${x}</span> se cumple <span class="math">${a}x + ${b} < ${a*x+1}</span>?`,
+        ...makeMC(x, [x+1, x-1, Math.floor((a*x+1-b)/a)],
+        `${a}x < ${a*x+1-b}, x < ${(a*x+1-b)/a}. Enteros: 1,2,...,${x-1} = ${x-1}`)});}
+
+    // Q14: Probability combined
+    { let a=randInt(1,4), b=randInt(1,6);
+      while(a>=b){b=randInt(2,8);}
+      let c=randInt(1,3), d=randInt(1,5);
+      while(c>=d){d=randInt(2,8);}
+      let num=a*c, den=b*d;
+      let g=(function(){for(let i=Math.min(num,den);i>=2;i--){if(num%i===0&&den%i===0)return i;}return 1;})();
+      Q.push({ text:`¿Cuál es la probabilidad de sacar <span class="math">${a}/${b}</span> y luego <span class="math">${c}/${d}</span>?`,
+        ...makeMC(`${num/g}/${den/g}`, [`${a+c}/${b+d}`, `${a*c}/${b+d}`, `${a}/${b*d}`],
+        `P = ${a}/${b} × ${c}/${d} = ${num}/${den} = ${num/g}/${den/g}`)});}
+
+    // Q15: Linear regression concept
+    { let x_vals=[1,2,3,4,5];
+      let m=randInt(2,6), b=randInt(1,10);
+      let y_vals=x_vals.map(x=>m*x+b+randInt(-1,1));
+      let sumX=x_vals.reduce((s,v)=>s+v,0);
+      let sumY=y_vals.reduce((s,v)=>s+v,0);
+      let predicted=m*6+b;
+      Q.push({ text:`Si la linea de mejor ajuste es <span class="math">y = ${m}x + ${b}</span>, ¿cuál es el valor predicho para <span class="math">x = 6</span>?`,
+        ...makeMC(predicted, [predicted+m, predicted-b, b+6],
+        `y = ${m}(6) + ${b} = ${6*m} + ${b} = ${predicted}`)});}
+
+    // Q16: Compound interest
+    { let P=randInt(500,2000), r=pick([3,4,5,6]), t=randInt(2,5);
+      let A=Math.round(P*Math.pow(1+r/100,t));
+      Q.push({ text:`<span class="math">$${P}</span> al <span class="math">${r}%</span> anual compuesto por <span class="math">${t}</span> años. ¿Monto final?`,
+        ...makeMC(`$${A}`, [`$${P+A-P+50}`, `$${P+r*t}`, `$${Math.round(P*(1+r/100*t))}`],
+        `A = ${P}(1+${r}/100)^${t} = $${A}`)});}
+
+    // Q17: Quadratic application
+    { let h0=randInt(10,50), v0=randInt(20,60);
+      let t=randInt(2,5);
+      let h=Math.round(h0+v0*t-16*t*t);
+      Q.push({ text:`Una pelota se lanza con <span class="math">${v0}</span> ft/s desde <span class="math">${h0}</span> ft. Altura a <span class="math">${t}</span> segundos: <span class="math">h(t) = ${h0} + ${v0}t - 16t^2</span>`,
+        ...makeMC(`${h} ft`, [`${h+10} ft`, `${h0+v0*t} ft`, `${h-16} ft`],
+        `h(${t}) = ${h0} + ${v0}(${t}) - 16(${t})^2 = ${h0} + ${v0*t} - ${16*t*t} = ${h}`)});}
+
+    // Q18: Data analysis
+    { let data=[]; for(let i=0;i<6;i++) data.push(randInt(10,50));
+      let sorted=[...data].sort((a,b)=>a-b);
+      let median=(sorted[2]+sorted[3])/2;
+      Q.push({ text:`Encuentra la mediana de: <span class="math">${data.join(', ')}</span>`,
+        ...makeNumeric(median, `Ordenando: ${sorted.join(', ')}. Mediana = (${sorted[2]}+${sorted[3]})/2 = ${median}`)});}
+
+    // Q19: Percent decrease
+    { let orig=randInt(100,500), pct=randInt(5,25);
+      let newVal=Math.round(orig*(1-pct/100));
+      Q.push({ text:`Un producto de <span class="math">$${orig}</span> tiene <span class="math">${pct}%</span> de descuento. ¿Precio final?`,
+        ...makeMC(`$${newVal}`, [`$${orig-pct}`, `$${Math.round(orig*(1+pct/100))}`, `$${orig-pct*10}`],
+        `Descuento = ${orig} × ${pct}/100 = $${Math.round(orig*pct/100)}. Precio = ${orig} - ${Math.round(orig*pct/100)} = $${newVal}`)});}
+
+    // Q20: Geometry - circle
+    { let r=randInt(3,12);
+      let circ=+(2*Math.PI*r).toFixed(1);
+      let area=+(Math.PI*r*r).toFixed(1);
+      Q.push({ text:`Un circulo tiene radio <span class="math">${r}</span>. ¿Circunferencia?`,
+        ...makeNumeric(circ, `C = 2πr = 2π(${r}) = ${circ}`)});}
+
+    // Q21: Slope-intercept
+    { let m=randInt(1,6), b=randInt(-8,8);
+      Q.push({ text:`¿Cuál es la pendiente de <span class="math">y = ${m}x ${b>=0?'+':''}${b}</span>?`,
+        ...makeMC(m, [m+1, b, -m],
+        `En y = mx + b, la pendiente es m = ${m}`)});}
+
+    // Q22: Volume
+    { let l=randInt(5,15), w=randInt(3,10), h=randInt(4,12);
+      let vol=l*w*h;
+      Q.push({ text:`Un rectangulo tiene <span class="math">largo=${l}, ancho=${w}, alto=${h}</span>. ¿Volumen?`,
+        ...makeMC(`${vol} u³`, [`${l+w+h} u³`, `${2*(l*w+w*h+l*h)} u³`, `${vol+10} u³`],
+        `V = ${l}×${w}×${h} = ${vol}`)});}
+
+    // Q23: Percent of a number
+    { let base=randInt(50,300), pct=randInt(10,50);
+      let ans=Math.round(base*pct/100);
+      Q.push({ text:`¿Cuanto es <span class="math">${pct}%</span> de <span class="math">${base}</span>?`,
+        ...makeMC(ans, [base+ans, base-pct, ans+10],
+        `${pct}% de ${base} = ${pct}/100 × ${base} = ${ans}`)});}
+
+    // Q24: Rate problem
+    { let d=randInt(100,500), r=randInt(30,80);
+      let t=+(d/r).toFixed(1);
+      Q.push({ text:`Un carro recorre <span class="math">${d} km</span> a <span class="math">${r} km/h</span>. ¿Cuánto tiempo?`,
+        ...makeNumeric(t, `t = d/v = ${d}/${r} = ${t} horas`)});}
+
+    // Q25: Quadratic roots
+    { let p=randInt(3,8), q=randInt(1,6);
+      let sum=p+q, prod=p*q;
+      Q.push({ text:`Las raices de <span class="math">x^2 - ${sum}x + ${prod} = 0</span> son:`,
+        ...makeMC(`${p} y ${q}`, [`${p} y ${-q}`, `${p+1} y ${q}`, `${sum} y ${prod}`],
+        `(x-${p})(x-${q})=0 → x=${p}, x=${q}`)});}
+
+    // Q26: Exponential decay
+    { let P0=randInt(100,1000), rate=randInt(5,15), t=randInt(2,5);
+      let ans=Math.round(P0*Math.pow(1-rate/100,t));
+      Q.push({ text:`Un物质 se reduce <span class="math">${rate}%</span> cada hora. De <span class="math">${P0}</span>g, ¿cuánto queda en <span class="math">${t}</span> horas?`,
+        ...makeMC(`${ans}g`, [`${P0-rate*t}g`, `${P0}g`, `${ans+20}g`],
+        `${P0}(1-${rate}/100)^${t} = ${P0}×${(1-rate/100).toFixed(2)}^${t} ≈ ${ans}g`)});}
+
+    // Q27: Parallel lines
+    { let m=randInt(1,6);
+      Q.push({ text:`¿Qué pendiente tiene una linea paralela a <span class="math">y = ${m}x + 3</span>?`,
+        ...makeMC(m, [m+1, -m, 1/m],
+        `Lineas paralelas tienen la misma pendiente: m = ${m}`)});}
+
+    // Q28: Weighted average
+    { let a=randInt(70,100), w1=randInt(2,4);
+      let b=randInt(60,90), w2=randInt(1,3);
+      let avg=Math.round((a*w1+b*w2)/(w1+w2));
+      Q.push({ text:`Promedio ponderado: <span class="math">${a}</span> (peso ${w1}) y <span class="math">${b}</span> (peso ${w2}). ¿Resultado?`,
+        ...makeNumeric(avg, `(${a}×${w1} + ${b}×${w2})/(${w1}+${w2}) = (${a*w1}+${b*w2})/${w1+w2} = ${avg}`)});}
+
+    // Q29: Similar triangles
+    { let s1=randInt(3,8), s2=randInt(5,12);
+      let ratio=randFloat(1.5,3);
+      let s3=+(s1*ratio).toFixed(1);
+      Q.push({ text:`Triangulos similares con ratio <span class="math">${ratio}</span>. Si un lado mide <span class="math">${s1}</span>, ¿cuánto mide el lado correspondiente?`,
+        ...makeNumeric(s3, `Lado = ${s1} × ${ratio} = ${s3}`)});}
+
+    // Q30: Absolute value inequality
+    { let a=randInt(2,10), r=randInt(3,12);
+      let count=2*r+1;
+      Q.push({ text:`¿Cuantos enteros satisfacen <span class="math">|x - ${a}| ≤ ${r}</span>?`,
+        ...makeNumeric(count, `|x-${a}| ≤ ${r} → ${a-r} ≤ x ≤ ${a+r}. Enteros: ${count}`)});}
+
+    // Q31: Numeric - mixture
+    { let strength1=randInt(10,30), vol1=randInt(5,20);
+      let strength2=randInt(40,80), vol2=randInt(5,20);
+      let result=Math.round((strength1*vol1+strength2*vol2)/(vol1+vol2));
+      Q.push({ text:`Mezcla: <span class="math">${vol1}</span>L al <span class="math">${strength1}%</span> y <span class="math">${vol2}</span>L al <span class="math">${strength2}%</span>. ¿Concentracion final?`,
+        ...makeNumeric(result, `(${strength1}×${vol1} + ${strength2}×${vol2})/(${vol1}+${vol2}) = ${result}%`)});}
+
+    // Q32: Numeric - profit
+    { let cost=randInt(10,50), sell=randInt(50,100), units=randInt(10,50);
+      let profit=(sell-cost)*units;
+      Q.push({ text:`Costo unitario <span class="math">$${cost}</span>, venta <span class="math">$${sell}</span>. ¿Ganancia con <span class="math">${units}</span> unidades?`,
+        ...makeNumeric(profit, `Ganancia = ($${sell}-$${cost})×${units} = $${sell-cost}×${units} = $${profit}`)});}
+
+    // Q33: Numeric - simple exponent
+    { let base=randInt(2,5), exp=randInt(2,3);
+      let ans=Math.pow(base,exp);
+      Q.push({ text:`Calcula: <span class="math">${base}^${exp}</span>`,
+        ...makeNumeric(ans, `${base}^${exp} = ${ans}`)});}
+
+    // Q34: Numeric - average from total
+    { let total=randInt(200,600), n=randInt(4,8);
+      let avg=Math.round(total/n);
+      Q.push({ text:`La suma de <span class="math">${n}</span> numeros es <span class="math">${total}</span>. ¿Cuál es el promedio?`,
+        ...makeNumeric(avg, `Promedio = ${total}/${n} = ${avg}`)});}
+
+    // Q35: Numeric - markup
+    { let cost=randInt(20,80), markup=randInt(15,50);
+      let sell=Math.round(cost*(1+markup/100));
+      Q.push({ text:`Un producto cuesta <span class="math">$${cost}</span> y se marca un <span class="math">${markup}%</span> de ganancia. ¿Precio de venta?`,
+        ...makeNumeric(sell, `Precio = $${cost} × (1 + ${markup}/100) = $${sell}`)});}
+
+    // Q36: Numeric - ratio total
+    { let a=randInt(3,8), b=randInt(2,6);
+      let total=randInt(50,100);
+      let shareA=Math.round(a*total/(a+b));
+      Q.push({ text:`Proporcion <span class="math">${a}:${b}</span> con total <span class="math">${total}</span>. ¿Parte mayor?`,
+        ...makeNumeric(Math.max(shareA,total-shareA), `Mayor = ${Math.max(a,b)}/${a+b} × ${total} = ${Math.max(shareA,total-shareA)}`)});}
+
+    // Q37: Numeric - percentage
+    { let whole=randInt(100,500), part=randInt(20,Math.floor(whole*0.8));
+      let pct=Math.round(part*100/whole);
+      Q.push({ text:`<span class="math">${part}</span> es que porcentaje de <span class="math">${whole}</span>?`,
+        ...makeNumeric(pct, `${part}/${whole} × 100 = ${pct}%`)});}
+
+    // Q38: Numeric - final problem
+    { let a=randInt(2,5), b=randInt(3,8);
+      let ans=+(a+b+a*b).toFixed(1);
+      Q.push({ text:`Si <span class="math">a = ${a}</span> y <span class="math">b = ${b}</span>, calcula <span class="math">a + b + a×b</span>`,
+        ...makeNumeric(ans, `${a} + ${b} + ${a}×${b} = ${a} + ${b} + ${a*b} = ${ans}`)});}
+
+    return Q;
+}
+
+// ============================================================
+// QUIZ ENGINE
+// ============================================================
+let selectedSection = null;
+let questions = [];
+let userAnswers = [];
+let currentQ = 0;
+let timer = null;
+let timeLeft = 0;
+let paused = false;
+let quizStarted = false;
+
+const times = { noCalc: 25*60, calc: 55*60 };
+const ANSWERS = {
+    noCalc: [2,1,3,0,1,2,1,3,1,0,0,1,1,2,2, 300, 40, 1, 0, 4],
+    calc: [0,0,0,2,1,3,0,1,2,1,0,3,0,2,3,0,1,2,3,1,2,0,0,1,2,3,1,3,0,2, 210, 35, 1, 4, 50, 10, 100, 3.5]
+};
+
+function selectSection(sec){
+    selectedSection = sec;
+    document.querySelectorAll('.section-card').forEach(c=>c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById('btnStart').disabled = false;
+}
+
+function startQuiz(){
+    if(!selectedSection) return;
+    questions = selectedSection==='noCalc' ? genNoCalc() : genCalc();
+    userAnswers = new Array(questions.length).fill(-1);
+    currentQ = 0;
+    timeLeft = times[selectedSection];
+    paused = false;
+
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('quizArea').classList.remove('hidden');
+
+    renderTabs();
+    renderQuestions();
+    showQuestion(0);
+    startTimer();
+    quizStarted = true;
+}
+
+function renderTabs(){
+    let tabs = document.getElementById('tabsArea');
+    if(selectedSection==='noCalc'){
+        tabs.innerHTML = `<div class="tab active">Section 3: No Calculator (20)</div>`;
+    } else {
+        tabs.innerHTML = `<div class="tab active">Section 4: Calculator (38)</div>`;
+    }
+}
+
+function renderQuestions(){
+    let body = document.getElementById('quizBody');
+    body.innerHTML = '';
+    questions.forEach((q,i)=>{
+        let modeBadge = selectedSection==='noCalc'
+            ? '<span class="mode-badge no-calc">NO CALCULATOR</span>'
+            : '<span class="mode-badge calc">CALCULATOR</span>';
+        let optionsHtml = q.options.map((opt,j)=>{
+            let letter = String.fromCharCode(65+j);
+            return `<div class="option" data-qi="${i}" data-oi="${j}" onclick="selectOption(${i},${j})">
+                <span class="option-marker">${letter}</span>
+                <span class="option-text">${opt}</span>
+            </div>`;
+        }).join('');
+
+        body.innerHTML += `
+        <div class="question-card" id="qc${i}">
+            ${i===0?modeBadge:''}
+            <span class="q-number">Pregunta ${i+1} de ${questions.length}</span>
+            <p class="q-text">${q.text}</p>
+            <div class="options" id="opts${i}">${optionsHtml}</div>
+            <div class="explanation" id="exp${i}">
+                <h4>Explicacion:</h4>
+                <p>${q.explanation}</p>
+            </div>
+        </div>`;
+    });
+}
+
+function selectOption(qi, oi){
+    if(paused) return;
+    userAnswers[qi] = oi;
+    let opts = document.querySelectorAll(`#opts${qi} .option`);
+    opts.forEach(o=>o.classList.remove('selected'));
+    opts[oi].classList.add('selected');
+    updateProgress();
+}
+
+function showQuestion(idx){
+    document.querySelectorAll('.question-card').forEach(c=>c.classList.remove('active'));
+    let card = document.getElementById(`qc${idx}`);
+    if(card) card.classList.add('active');
+    currentQ = idx;
+    document.getElementById('qCounter').textContent = `${idx+1} / ${questions.length}`;
+    updateProgress();
+    renderNavButtons();
+}
+
+function renderNavButtons(){
+    let existing = document.querySelector('.nav-buttons');
+    if(existing) existing.remove();
+
+    let nav = document.createElement('div');
+    nav.className = 'nav-buttons';
+
+    let prev = document.createElement('button');
+    prev.className = `btn btn-prev ${currentQ===0?'hidden':''}`;
+    prev.textContent = 'Anterior';
+    prev.onclick = ()=> showQuestion(currentQ-1);
+
+    let next = document.createElement('button');
+    if(currentQ === questions.length-1){
+        next.className = 'btn btn-submit';
+        next.textContent = 'Enviar Respuestas';
+        next.onclick = submitQuiz;
+    } else {
+        next.className = 'btn btn-next';
+        next.textContent = 'Siguiente';
+        next.onclick = ()=> showQuestion(currentQ+1);
+    }
+
+    nav.appendChild(prev);
+    nav.appendChild(next);
+    document.getElementById('quizBody').appendChild(nav);
+}
+
+function updateProgress(){
+    let pct = ((currentQ+1)/questions.length)*100;
+    document.getElementById('progressFill').style.width = pct+'%';
+}
+
+// TIMER
+function startTimer(){
+    updateTimerDisplay();
+    timer = setInterval(()=>{
+        if(paused) return;
+        timeLeft--;
+        updateTimerDisplay();
+        if(timeLeft<=0){
+            clearInterval(timer);
+            submitQuiz();
+        }
+    },1000);
+}
+
+function updateTimerDisplay(){
+    let m=Math.floor(timeLeft/60), s=timeLeft%60;
+    let display = document.getElementById('timerDisplay');
+    display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    display.classList.toggle('warning', timeLeft<=60);
+}
+
+function togglePause(){
+    paused = !paused;
+    document.getElementById('btnPause').textContent = paused ? 'Reanudar' : 'Pausa';
+    document.getElementById('btnPause').style.background = paused ? 'rgba(248,113,113,0.3)' : 'rgba(255,255,255,0.1)';
+}
+
+// SUBMIT
+function submitQuiz(){
+    clearInterval(timer);
+    let score = 0;
+    let resultsHtml = '';
+
+    for(let i=0; i<questions.length; i++){
+        let q = questions[i];
+        let opts = document.querySelectorAll(`#opts${i} .option`);
+        opts.forEach((o,j)=>{
+            o.style.pointerEvents='none';
+            if(j===q.correctIdx) o.classList.add('correct');
+            if(j===userAnswers[i] && j!==q.correctIdx) o.classList.add('incorrect');
+        });
+        document.getElementById(`exp${i}`).classList.add('show');
+
+        let isCorrect = userAnswers[i] === q.correctIdx;
+        if(isCorrect) score++;
+
+        let letters = ['A','B','C','D'];
+        let userLetter = userAnswers[i]>=0 ? letters[userAnswers[i]] : 'Sin respuesta';
+        resultsHtml += `<div class="result-card ${isCorrect?'correct':'incorrect'}">
+            <span class="rc-label">Pregunta ${i+1}: Tu respuesta ${userLetter}</span>
+            <span class="rc-status">${isCorrect?'Correcta':'Incorrecta'}</span>
+        </div>`;
+    }
+
+    let total = questions.length;
+    let pct = Math.round(score*100/total);
+    let icon, msg;
+    if(pct>=90){ icon='🏆'; msg='Excelente! Dominio casi perfecto.'; }
+    else if(pct>=70){ icon='👏'; msg='Muy bien! Sigue practicando para perfeccionar.'; }
+    else if(pct>=50){ icon='📚'; msg='Buen avance. Revisa las explicaciones de los errores.'; }
+    else { icon='💪'; msg='No te rindas! Estudia las explicaciones y vuelve a intentar.'; }
+
+    document.getElementById('quizArea').classList.add('hidden');
+    document.getElementById('resultsArea').innerHTML = `
+        <div class="results active">
+            <div class="results-icon">${icon}</div>
+            <h2>Resultados</h2>
+            <div class="score-text">${score} / ${total}</div>
+            <div class="score-detail">Puntuacion: ${pct}%</div>
+            <div class="score-message">${msg}</div>
+            <div class="results-section">
+                <h3>Resumen de respuestas</h3>
+                ${resultsHtml}
+            </div>
+            <br>
+            <button class="btn btn-restart" onclick="goHome()">Volver al inicio</button>
+            <p style="color:#555;font-size:0.75rem;margin-top:20px;font-style:italic;">Prof. Mag. Ing. Carlos Marcelo Vera Irala</p>
+        </div>
+    `;
+}
+
+function goHome(){
+    selectedSection = null;
+    quizStarted = false;
+    document.getElementById('startScreen').classList.remove('hidden');
+    document.getElementById('quizArea').classList.add('hidden');
+    document.getElementById('resultsArea').innerHTML = '';
+    document.querySelectorAll('.section-card').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('btnStart').disabled = true;
+}
+</script>
 </body>
 </html>
