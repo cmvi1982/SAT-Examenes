@@ -319,7 +319,7 @@ function genNoCalc(){
     { let a=randInt(2,6), b=randInt(1,8), c=randInt(10,30);
       let x=(c-b)/a; let wrongs=[x+randInt(1,3), x-randInt(1,3), x*2];
       Q.push({ text:`Si <span class="math">${a}x + ${b} = ${c}</span>, cual es el valor de <span class="math">x</span>?`,
-        ...makeMC(x, wrongs, `Resolvemos: ${a}x = ${c}-${b} = ${c-b}, entonces x = ${c-b}/${a} = ${x}`)});}
+        ...makeMC(x, wrongs, `Resolvemos: ${a}x = ${c} - ${b} = ${c-b}, entonces x = ${x}`)});}
 
     // Q2: System of equations
     { let x=randInt(2,7), y=randInt(1,5);
@@ -418,8 +418,8 @@ function genNoCalc(){
     { let m=randFloat(1,9), e=randInt(2,5);
       let val=m*Math.pow(10,e);
       Q.push({ text:`Expresa <span class="math">${val.toLocaleString()}</span> en notacion cientifica.`,
-        ...makeMC(`${m} × 10^${e}`, [`${m} × 10^${e+1}`, `${m*10} × 10^${e-1}`, `${m/10} × 10^${e+1}`],
-        `${val} = ${m} × 10^${e}`)});}
+        ...makeMC(`<span class="math">${m} \\times 10^{${e}}</span>`, [`<span class="math">${m} \\times 10^{${e+1}}</span>`, `<span class="math">${m*10} \\times 10^{${e-1}}</span>`, `<span class="math">${m/10} \\times 10^{${e+1}}</span>`],
+        `<span class="math">${val} = ${m} \\times 10^{${e}}</span>`)});}
 
     // Q15: Average problem
     { let n=randInt(4,6), avg=randInt(70,95);
@@ -804,7 +804,13 @@ function renderQuestions(){
             : '<span class="mode-badge calc">CALCULATOR</span>';
         let optionsHtml = q.options.map((opt,j)=>{
             let letter = String.fromCharCode(65+j);
-            let optText = opt.replace(/<span class="math">([^<]*)<\/span>/g, (m,p1)=>`<span class="math">${toLatex(p1)}</span>`);
+            let optText = opt;
+            // If option already has <span class="math">, convert content
+            optText = optText.replace(/<span class="math">([^<]*)<\/span>/g, (m,p1)=>`<span class="math">${toLatex(p1)}</span>`);
+            // If option is plain text with math symbols, wrap in math span
+            if(!opt.includes('<span class="math">') && /\d\^|^\d|^-[a-zA-Z]|[a-zA-Z]\^|×|÷|\d+\/\d+|\$/.test(opt)){
+                optText = `<span class="math">${toLatex(opt)}</span>`;
+            }
             return `<div class="option" data-qi="${i}" data-oi="${j}" onclick="selectOption(${i},${j})">
                 <span class="option-marker">${letter}</span>
                 <span class="option-text">${optText}</span>
