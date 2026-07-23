@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Matemáticas SAT - Ximena</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3561 0%, #1e2243 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4ade80;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-body {
+            padding: 30px;
+        }
+
+        .question-card {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #1e293b;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .question-text .math {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 1.05rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 1rem;
+            color: #334155;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+            font-weight: 600;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .option-marker {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-right: 14px;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+        }
+
+        .option.selected .option-marker {
+            background: #667eea;
+            color: white;
+        }
+
+        .option.correct .option-marker {
+            background: #22c55e;
+            color: white;
+        }
+
+        .option.incorrect .option-marker {
+            background: #ef4444;
+            color: white;
+        }
+
+        .explanation {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-left: 4px solid #667eea;
+            border-radius: 0 12px 12px 0;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .explanation p {
+            color: #334155;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .explanation .math-step {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            background: white;
+            padding: 3px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 3px 2px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-prev:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .btn-next:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            margin-left: auto;
+            font-size: 1.05rem;
+            padding: 14px 35px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 14px 35px;
+            font-size: 1.05rem;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .results {
+            display: none;
+            text-align: center;
+            padding: 40px 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .results h2 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .results .score-text {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+
+        .results .score-detail {
+            color: #64748b;
+            font-size: 1.05rem;
+            margin-bottom: 10px;
+        }
+
+        .results .message {
+            font-size: 1.1rem;
+            color: #334155;
+            margin: 20px 0 30px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .distractor-info {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .distractor-info h3 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .distractor-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .distractor-card h4 {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .distractor-card p {
+            color: #334155;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 12px;
+                margin: 10px;
+            }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.3rem; }
+            .quiz-body { padding: 20px; }
+            .question-text { font-size: 1rem; }
+            .btn { padding: 10px 20px; font-size: 0.9rem; }
+            .results .score-text { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Test de Matemáticas SAT</h1>
+        <p>Ximena — 5 Preguntas de Seleccion Multiple</p>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+    </div>
+
+    <div class="quiz-body" id="quizBody">
+
+        <!-- Pregunta 1 -->
+        <div class="question-card active" data-question="0">
+            <span class="question-number">Pregunta 1 de 5</span>
+            <p class="question-text">
+                Si <span class="math">3x + 7 = 22</span>, ¿cuál es el valor de <span class="math">6x + 4</span>?
+            </p>
+            <div class="options">
+                <div class="option" onclick="selectOption(this, 0)">
+                    <span class="option-marker">A</span>
+                    <span>26</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 0)">
+                    <span class="option-marker">B</span>
+                    <span>30</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 0)">
+                    <span class="option-marker">C</span>
+                    <span>34</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 0)">
+                    <span class="option-marker">D</span>
+                    <span>38</span>
+                </div>
+            </div>
+            <div class="explanation" id="exp0">
+                <h4>Explicacion:</h4>
+                <p>
+                    Primero resolvemos para <span class="math-step">x</span>:<br>
+                    <span class="math-step">3x + 7 = 22</span> &rarr; <span class="math-step">3x = 15</span> &rarr; <span class="math-step">x = 5</span><br><br>
+                    Ahora sustituimos en la expresion <span class="math-step">6x + 4</span>:<br>
+                    <span class="math-step">6(5) + 4 = 30 + 4 = 34</span><br><br>
+                    <strong>Respuesta: C) 34</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Pregunta 2 -->
+        <div class="question-card" data-question="1">
+            <span class="question-number">Pregunta 2 de 5</span>
+            <p class="question-text">
+                Un estudiante obtuvo calificaciones de <span class="math">85, 90, 78, 92</span> y <span class="math">80</span> en cinco examenes. ¿Cual es la media aritmetica de sus calificaciones?
+            </p>
+            <div class="options">
+                <div class="option" onclick="selectOption(this, 1)">
+                    <span class="option-marker">A</span>
+                    <span>82</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 1)">
+                    <span class="option-marker">B</span>
+                    <span>83</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 1)">
+                    <span class="option-marker">C</span>
+                    <span>84</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 1)">
+                    <span class="option-marker">D</span>
+                    <span>85</span>
+                </div>
+            </div>
+            <div class="explanation" id="exp1">
+                <h4>Explicacion:</h4>
+                <p>
+                    La media aritmetica es la suma de todos los valores dividida entre la cantidad de valores:<br>
+                    <span class="math-step">Media = (85 + 90 + 78 + 92 + 80) / 5</span><br>
+                    <span class="math-step">Media = 425 / 5 = 85</span><br><br>
+                    <strong>Respuesta: D) 85</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Pregunta 3 -->
+        <div class="question-card" data-question="2">
+            <span class="question-number">Pregunta 3 de 5</span>
+            <p class="question-text">
+                Un rectangulo tiene un perimetro de <span class="math">36 cm</span>. Si el largo es el doble del ancho, ¿cual es el area del rectangulo?
+            </p>
+            <div class="options">
+                <div class="option" onclick="selectOption(this, 2)">
+                    <span class="option-marker">A</span>
+                    <span>48 cm²</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 2)">
+                    <span class="option-marker">B</span>
+                    <span>54 cm²</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 2)">
+                    <span class="option-marker">C</span>
+                    <span>72 cm²</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 2)">
+                    <span class="option-marker">D</span>
+                    <span>96 cm²</span>
+                </div>
+            </div>
+            <div class="explanation" id="exp2">
+                <h4>Explicacion:</h4>
+                <p>
+                    Sea el ancho <span class="math-step">w</span> y el largo <span class="math-step">l = 2w</span>.<br>
+                    Perimetro: <span class="math-step">2(l + w) = 36</span> &rarr; <span class="math-step">2(2w + w) = 36</span> &rarr; <span class="math-step">6w = 36</span> &rarr; <span class="math-step">w = 6 cm</span><br>
+                    Largo: <span class="math-step">l = 2(6) = 12 cm</span><br>
+                    Area: <span class="math-step">l × w = 12 × 6 = 72 cm²</span><br><br>
+                    <strong>Respuesta: C) 72 cm²</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Pregunta 4 -->
+        <div class="question-card" data-question="3">
+            <span class="question-number">Pregunta 4 de 5</span>
+            <p class="question-text">
+                Si <span class="math">f(x) = 2x² - 3x + 1</span>, ¿cuál es el valor de <span class="math">f(-2)</span>?
+            </p>
+            <div class="options">
+                <div class="option" onclick="selectOption(this, 3)">
+                    <span class="option-marker">A</span>
+                    <span>15</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 3)">
+                    <span class="option-marker">B</span>
+                    <span>3</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 3)">
+                    <span class="option-marker">C</span>
+                    <span>-1</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 3)">
+                    <span class="option-marker">D</span>
+                    <span>-13</span>
+                </div>
+            </div>
+            <div class="explanation" id="exp3">
+                <h4>Explicacion:</h4>
+                <p>
+                    Sustituimos <span class="math-step">x = -2</span> en la funcion:<br>
+                    <span class="math-step">f(-2) = 2(-2)² - 3(-2) + 1</span><br>
+                    <span class="math-step">= 2(4) + 6 + 1</span><br>
+                    <span class="math-step">= 8 + 6 + 1 = 15</span><br><br>
+                    <strong>Respuesta: A) 15</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Pregunta 5 -->
+        <div class="question-card" data-question="4">
+            <span class="question-number">Pregunta 5 de 5</span>
+            <p class="question-text">
+                Un carro viaja a <span class="math">60 km/h</span> durante <span class="math">2.5 horas</span> y luego a <span class="math">80 km/h</span> durante <span class="math">1.5 horas</span>. ¿Cuál es la distancia total recorrida?
+            </p>
+            <div class="options">
+                <div class="option" onclick="selectOption(this, 4)">
+                    <span class="option-marker">A</span>
+                    <span>240 km</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 4)">
+                    <span class="option-marker">B</span>
+                    <span>250 km</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 4)">
+                    <span class="option-marker">C</span>
+                    <span>270 km</span>
+                </div>
+                <div class="option" onclick="selectOption(this, 4)">
+                    <span class="option-marker">D</span>
+                    <span>290 km</span>
+                </div>
+            </div>
+            <div class="explanation" id="exp4">
+                <h4>Explicacion:</h4>
+                <p>
+                    Usamos la formula <span class="math-step">distancia = velocidad × tiempo</span>:<br>
+                    Primer tramo: <span class="math-step">60 × 2.5 = 150 km</span><br>
+                    Segundo tramo: <span class="math-step">80 × 1.5 = 120 km</span><br>
+                    Distancia total: <span class="math-step">150 + 120 = 270 km</span><br><br>
+                    <strong>Respuesta: C) 270 km</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Navegacion -->
+        <div class="nav-buttons" id="navButtons">
+            <button class="btn btn-prev hidden" id="btnPrev" onclick="prevQuestion()">Anterior</button>
+            <button class="btn btn-next" id="btnNext" onclick="nextQuestion()">Siguiente</button>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="results" id="results">
+        <div class="results-icon" id="resultsIcon"></div>
+        <h2>Resultados del Test</h2>
+        <div class="score-text" id="scoreText"></div>
+        <div class="score-detail" id="scoreDetail"></div>
+        <div class="message" id="scoreMessage"></div>
+
+        <div class="distractor-info" id="distractorInfo"></div>
+
+        <button class="btn btn-restart" onclick="restartQuiz()">Volver a Intentar</button>
+    </div>
+</div>
+
+<script>
+    const answers = [2, 3, 2, 0, 2]; // indices correctos (0-based): C, D, C, A, C
+    const userAnswers = [-1, -1, -1, -1, -1];
+    let currentQuestion = 0;
+    const totalQuestions = 5;
+
+    function selectOption(el, qIndex) {
+        const card = document.querySelector(`.question-card[data-question="${qIndex}"]`);
+        const options = card.querySelectorAll('.option');
+        options.forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        userAnswers[qIndex] = Array.from(options).indexOf(el);
+        updateNavButtons();
+    }
+
+    function updateNavButtons() {
+        const btnNext = document.getElementById('btnNext');
+        const btnPrev = document.getElementById('btnPrev');
+
+        btnPrev.classList.toggle('hidden', currentQuestion === 0);
+
+        if (currentQuestion === totalQuestions - 1) {
+            if (userAnswers.every(a => a !== -1)) {
+                btnNext.textContent = 'Enviar Respuestas';
+                btnNext.className = 'btn btn-submit';
+                btnNext.onclick = submitQuiz;
+            } else {
+                btnNext.textContent = 'Siguiente';
+                btnNext.className = 'btn btn-next';
+                btnNext.onclick = nextQuestion;
+            }
+        } else {
+            btnNext.textContent = 'Siguiente';
+            btnNext.className = 'btn btn-next';
+            btnNext.onclick = nextQuestion;
+        }
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < totalQuestions - 1) {
+            document.querySelector('.question-card.active').classList.remove('active');
+            currentQuestion++;
+            document.querySelector(`.question-card[data-question="${currentQuestion}"]`).classList.add('active');
+            updateProgress();
+            updateNavButtons();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            document.querySelector('.question-card.active').classList.remove('active');
+            currentQuestion--;
+            document.querySelector(`.question-card[data-question="${currentQuestion}"]`).classList.add('active');
+            updateProgress();
+            updateNavButtons();
+        }
+    }
+
+    function updateProgress() {
+        const pct = ((currentQuestion + 1) / totalQuestions) * 100;
+        document.getElementById('progressFill').style.width = pct + '%';
+    }
+
+    function submitQuiz() {
+        let score = 0;
+        const results = [];
+
+        for (let i = 0; i < totalQuestions; i++) {
+            const card = document.querySelector(`.question-card[data-question="${i}"]`);
+            const options = card.querySelectorAll('.option');
+            const correctIdx = answers[i];
+            const userIdx = userAnswers[i];
+
+            options.forEach((opt, idx) => {
+                opt.style.pointerEvents = 'none';
+                if (idx === correctIdx) {
+                    opt.classList.add('correct');
+                }
+                if (idx === userIdx && idx !== correctIdx) {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+
+            const isCorrect = userIdx === correctIdx;
+            if (isCorrect) score++;
+
+            results.push({
+                question: i + 1,
+                correct: isCorrect,
+                userAnswer: userIdx,
+                correctAnswer: correctIdx
+            });
+        }
+
+        document.getElementById('navButtons').classList.add('hidden');
+        showResults(score, results);
+    }
+
+    function showResults(score, results) {
+        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.classList.add('active');
+
+        const pct = Math.round((score / totalQuestions) * 100);
+        document.getElementById('scoreText').textContent = `${score} / ${totalQuestions}`;
+        document.getElementById('scoreDetail').textContent = `Puntuacion: ${pct}%`;
+
+        const icons = document.getElementById('resultsIcon');
+        const msg = document.getElementById('scoreMessage');
+
+        if (score === 5) {
+            icons.textContent = 'Perfecto';
+            msg.textContent = 'Excelente! Respuestas perfectas. Ximena esta muy bien preparada.';
+        } else if (score >= 3) {
+            icons.textContent = 'Buen trabajo';
+            msg.textContent = 'Buen resultado! Revisa las explicaciones de las preguntas que fallaste para reforzar los conceptos.';
+        } else {
+            icons.textContent = 'Sigue practicando';
+            msg.textContent = 'No te preocupes. Revisa cada explicacion detenidamente y vuelve a intentarlo. La practica hace al maestro!';
+        }
+
+        let html = '<h3>Resumen por Pregunta</h3>';
+        results.forEach(r => {
+            const status = r.correct ? 'Correcta' : 'Incorrecta';
+            const color = r.correct ? '#22c55e' : '#ef4444';
+            const optionsLabels = ['A', 'B', 'C', 'D'];
+            html += `
+                <div class="distractor-card">
+                    <h4 style="color:${color}">Pregunta ${r.question} — ${status}</h4>
+                    <p>Tu respuesta: ${optionsLabels[r.userAnswer]} | Respuesta correcta: ${optionsLabels[r.correctAnswer]}</p>
+                </div>
+            `;
+        });
+
+        document.getElementById('distractorInfo').innerHTML = html;
+    }
+
+    function restartQuiz() {
+        userAnswers.fill(-1);
+        currentQuestion = 0;
+
+        document.querySelectorAll('.option').forEach(opt => {
+            opt.classList.remove('selected', 'correct', 'incorrect');
+            opt.style.pointerEvents = 'auto';
+        });
+        document.querySelectorAll('.explanation').forEach(e => e.classList.remove('show'));
+
+        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+        document.querySelector('.question-card[data-question="0"]').classList.add('active');
+
+        document.getElementById('results').classList.remove('active');
+        document.getElementById('navButtons').classList.remove('hidden');
+        document.getElementById('navButtons').style.display = 'flex';
+
+        updateProgress();
+        updateNavButtons();
+    }
+
+    updateProgress();
+    updateNavButtons();
+</script>
+
+</body>
+</html>
