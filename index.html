@@ -814,8 +814,8 @@ function renderQuestions(){
         let qText = q.text.replace(/<span class="math">([^<]*)<\/span>/g, (m,p1)=>`<span class="math">${toLatex(p1)}</span>`);
         let expHtml = q.explanation
             .replace(/<span class="step">([^<]*)<\/span>/g, (m,p1)=>`<span class="step">${toLatex(p1)}</span>`)
+            .replace(/([a-zA-Z0-9])\^(\d+)/g, '$1^{$2}')
             .replace(/(\d+)\s*\/\s*(\d+)/g, '\\frac{$1}{$2}')
-            .replace(/([a-zA-Z0-9])\^([a-zA-Z0-9]+)/g, '$1^{$2}')
             .replace(/π/g, '\\pi')
             .replace(/≠/g, '\\neq')
             .replace(/≤/g, '\\leq')
@@ -992,9 +992,13 @@ function restartRenderFlags(){
 // KaTeX MATH RENDERING
 // ============================================================
 function toLatex(s){
+    // Exponents FIRST: x^NN -> x^{NN}
+    s = s.replace(/([a-zA-Z0-9])\^(\d+)/g, '$1^{$2}');
+    // Fractions ONLY between plain numbers (not after ^)
     s = s.replace(/(\d+)\s*\/\s*(\d+)/g, '\\frac{$1}{$2}');
+    // Absolute values
     s = s.replace(/\|([^|]+)\|/g, '\\lvert $1 \\rvert');
-    s = s.replace(/([a-zA-Z0-9])\^([a-zA-Z0-9]+)/g, '$1^{$2}');
+    // Special chars
     s = s.replace(/≠/g, '\\neq');
     s = s.replace(/≤/g, '\\leq');
     s = s.replace(/≥/g, '\\geq');
